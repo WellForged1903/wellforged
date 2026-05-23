@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Wellforged | The No Nonsense Supplement Brand</title>
+    <meta name="description" content="Pure ingredients, zero fillers, and absolute clarity. Wellforged is the no nonsense supplement brand built on integrity and evidence." />
+    <meta name="author" content="Wellforged" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <meta name="google-site-verification" content="uUXT8EOkidxG6y1nmQDFnmQYk6xex_vD_qgqY-AunuQ" />
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8QTRDRD26T"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-8QTRDRD26T');
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Open Graph / Meta tags are dynamically handled by React Helmet in individual pages, 
+         these are fallback base tags -->
+    <meta property="og:title" content="Wellforged" />
+    <meta property="og:description" content="The No Nonsense Supplement Brand." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Wellforged" />
+
+    <!-- Performance Headers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Production Safety: Silence rogue localhost asset calls from legacy telemetry -->
+    <script>
+      (function() {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.tagName === 'IMG' || node.tagName === 'IMAGE') {
+                if (node.src && node.src.includes('localhost:')) {
+                  console.debug('Silenced legacy asset:', node.src);
+                  node.src = '/placeholder.svg';
+                }
+              }
+            });
+          });
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        
+        // Intercept network requests for localhost
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+          if (typeof url === 'string' && url.includes('localhost:') && !url.includes(':5000') && !url.includes(':5001')) {
+            return Promise.reject(new Error('Blocked stale localhost request'));
+          }
+          return originalFetch.apply(this, arguments);
+        };
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- No-JS Fallback -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: sans-serif;">
+        <h1>JavaScript is Required</h1>
+        <p>Please enable JavaScript to view the WellForged experience.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "wellforged.in"
+        }
+      ],
+      "destination": "https://www.wellforged.in/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/assets/(.*)", "destination": "/assets/$1" },
+    { "source": "/(.*)", "destination": "/" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "img-src 'self' https: data: blob:; upgrade-insecure-requests; block-all-mixed-content"
+        }
+      ]
+    }
+  ]
+}
+

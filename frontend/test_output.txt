@@ -1,0 +1,44 @@
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] ΓÇ║ tests\wellforged-comprehensive.spec.ts:10:5 ΓÇ║ WellForged Comprehensive E2E Suite ΓÇ║ Scenario 1: The Premium User Journey (UI & Transitions)
+[1A[2K  1) [chromium] ΓÇ║ tests\wellforged-comprehensive.spec.ts:10:5 ΓÇ║ WellForged Comprehensive E2E Suite ΓÇ║ Scenario 1: The Premium User Journey (UI & Transitions) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('h1')
+    Timeout: 5000ms
+    [32m- Expected  - 5[39m
+    [31m+ Received  + 1[39m
+
+    [2m  Array [[22m
+    [32m-   "Proof",[39m
+    [32m-   "is",[39m
+    [32m-   "the",[39m
+    [32m-   "New",[39m
+    [32m-   "Standard.",[39m
+    [31m+   "ProofistheNewStandard.",[39m
+    [2m  ][22m
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1')[22m
+    [2m    8 ├ù locator resolved to 1 element[22m
+
+
+      10 |     test('Scenario 1: The Premium User Journey (UI & Transitions)', async ({ page }) => {
+      11 |         // 1. Landing & Animation Check
+    > 12 |         await expect(page.locator('h1')).toContainText(['Proof', 'is', 'the', 'New', 'Standard.']);
+         |                                          ^
+      13 |
+      14 |         // 2. Transparency Flow
+      15 |         const transparencyCTA = page.getByRole('button', { name: 'Verify Your Batch' }).first();
+        at D:\wellforged - 2\frontend\tests\wellforged-comprehensive.spec.ts:12:42
+
+    Error Context: test-results\wellforged-comprehensive-W-50819-ser-Journey-UI-Transitions--chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] ΓÇ║ tests\wellforged-comprehensive.spec.ts:10:5 ΓÇ║ WellForged Comprehensive E2E Suite ΓÇ║ Scenario 1: The Premium User Journey (UI & Transitions) 
+
+[36m  Serving HTML report at http://localhost:63853. Press Ctrl+C to quit.[39m
