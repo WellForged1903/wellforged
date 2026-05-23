@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import SEO from "@/components/SEO";
 import { useNavigate } from "react-router-dom";
-import { Check, Leaf, Shield, FlaskConical, QrCode, Globe, CheckCircle, ChevronLeft, ChevronRight, Sparkles, Clock3, HeartHandshake, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Check, Leaf, Shield, FlaskConical, QrCode, Globe, CheckCircle, ChevronLeft, ChevronRight, Sparkles, Clock3, HeartHandshake, ArrowRight, CheckCircle2, Star } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
