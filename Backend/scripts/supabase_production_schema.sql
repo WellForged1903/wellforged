@@ -216,12 +216,13 @@ CREATE TABLE payments (
 -- 14. TRANSPARENCY: REPORT BATCHES
 -- =============================================================
 CREATE TABLE report_batches (
-    id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    product_id   UUID REFERENCES products(id) ON DELETE CASCADE,
-    batch_number VARCHAR(100) NOT NULL,
-    testing_date DATE,
-    tested_by    VARCHAR(255),
-    created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id     UUID REFERENCES products(id) ON DELETE CASCADE,
+    batch_number   VARCHAR(100) NOT NULL,
+    testing_date   DATE,
+    tested_by      VARCHAR(255),
+    lab_report_url TEXT,
+    created_at     TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(product_id, batch_number)
 );
 

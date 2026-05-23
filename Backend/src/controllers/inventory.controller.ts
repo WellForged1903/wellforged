@@ -50,6 +50,7 @@ export const getBatchReport = async (req: any, res: Response) => {
             productName: batch.productName,
             testDate: batch.testing_date,
             labName: batch.tested_by || 'WellForged Lab',
+            labReportUrl: batch.lab_report_url || null,
             status: tests.every(t => t.status === 'passed') ? 'passed' : 'failed',
             tests: tests
         });
@@ -77,7 +78,7 @@ export const getInventoryLogs = async (req: Request, res: Response) => {
 };
 
 export const createBatchReport = async (req: Request, res: Response) => {
-    const { product_id, batch_number, testing_date, tested_by, test_results } = req.body;
+    const { product_id, batch_number, testing_date, tested_by, lab_report_url, test_results } = req.body;
 
     if (!Array.isArray(test_results)) {
         return res.status(400).json({ message: 'test_results must be an array' });
@@ -89,9 +90,9 @@ export const createBatchReport = async (req: Request, res: Response) => {
         await client.query('BEGIN');
 
         const batchResult = await client.query(
-            `INSERT INTO report_batches (product_id, batch_number, testing_date, tested_by) 
-             VALUES ($1, $2, $3, $4) RETURNING *`,
-            [product_id, batch_number, testing_date, tested_by]
+            `INSERT INTO report_batches (product_id, batch_number, testing_date, tested_by, lab_report_url) 
+             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+            [product_id, batch_number, testing_date, tested_by, lab_report_url]
         );
         const batch = batchResult.rows[0];
 
