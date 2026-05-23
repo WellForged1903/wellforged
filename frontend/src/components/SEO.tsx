@@ -24,7 +24,7 @@ const SEO = ({
   noindex = false,
 }: SEOProps) => {
   const siteName = "WellForged";
-  const origin = "https://wellforged.in";
+  const origin = "https://www.wellforged.in";
   const canonicalUrl = canonical.startsWith("http")
     ? canonical
     : `${origin}${canonical.startsWith("/") ? "" : "/"}${canonical}`;

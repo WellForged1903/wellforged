@@ -159,7 +159,7 @@ const ProductPage = () => {
 
   const productName = product?.name || "Organic Export-Grade Moringa Powder";
   const productDescription = product?.base_description || "Source pure, premium-grade Moringa powder packed with antioxidants. 100% transparent sourcing and batch testing.";
-  const canonicalUrl = "https://wellforged.in/product";
+  const canonicalUrl = "https://www.wellforged.in/product";
   const seoTitle = `${productName} | WellForged`;
 
   return (
