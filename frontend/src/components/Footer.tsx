@@ -7,6 +7,7 @@ const Footer = () => {
     { name: "About", href: "/about" },
     { name: "Products", href: "/product" },
     { name: "Transparency", href: "/transparency" },
+    { name: "Journal (Blog)", href: "/blog" },
     { name: "Contact Us", href: "/contact-us" },
   ];
   const socialLinks = [
@@ -76,10 +77,16 @@ const Footer = () => {
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-6">
               <p className="font-body text-[9px] text-muted-foreground sm:text-[10px]">© {new Date().getFullYear()} WellForged. All rights reserved.</p>
             </div>
-            <div className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5">
-              <Shield className="h-3 w-3 text-primary" />
-              <CheckCircle className="h-2.5 w-2.5 text-primary" />
-              <span className="font-body text-[9px] font-medium text-primary">Secure & Verified Checkout</span>
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <Link to="/transparency" className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 transition-colors hover:bg-gold/20">
+                <Shield className="h-3.5 w-3.5 text-gold" />
+                <span className="font-body text-[10px] font-bold text-gold uppercase tracking-wider">NABL Certified Reports</span>
+              </Link>
+              <div className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2 py-1">
+                <Shield className="h-3 w-3 text-primary" />
+                <CheckCircle className="h-2.5 w-2.5 text-primary" />
+                <span className="font-body text-[9px] font-medium text-primary">Secure Checkout</span>
+              </div>
             </div>
           </div>
         </div>

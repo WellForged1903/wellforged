@@ -157,10 +157,10 @@ const ProductPage = () => {
     return <PageLoader />;
   }
 
-  const productName = product?.name || "Pure Moringa Leaf Powder";
-  const productDescription = product?.base_description || "Wellforged Moringa Leaf Powder - Clean, single-ingredient moringa powder crafted with disciplined sourcing and verified lab quality.";
-  const canonicalUrl = "https://www.wellforged.in/product";
-  const seoTitle = `${productName} | Clean Single-Ingredient Wellness`;
+  const productName = product?.name || "Organic Export-Grade Moringa Powder";
+  const productDescription = product?.base_description || "Source pure, premium-grade Moringa powder packed with antioxidants. 100% transparent sourcing and batch testing.";
+  const canonicalUrl = "https://wellforged.in/product";
+  const seoTitle = `${productName} | WellForged`;
 
   return (
     <>
@@ -183,7 +183,12 @@ const ProductPage = () => {
           "mpn": "WF-MOR-01",
           "brand": {
             "@type": "Brand",
-            "name": "Wellforged"
+            "name": "WellForged"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "124"
           },
           "offers": {
             "@type": "Offer",

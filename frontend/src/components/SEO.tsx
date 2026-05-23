@@ -23,8 +23,8 @@ const SEO = ({
   googleSiteVerification = "uUXT8EOkidxG6y1nmQDFnmQYk6xex_vD_qgqY-AunuQ",
   noindex = false,
 }: SEOProps) => {
-  const siteName = "Wellforged";
-  const origin = "https://www.wellforged.in";
+  const siteName = "WellForged";
+  const origin = "https://wellforged.in";
   const canonicalUrl = canonical.startsWith("http")
     ? canonical
     : `${origin}${canonical.startsWith("/") ? "" : "/"}${canonical}`;
@@ -32,10 +32,10 @@ const SEO = ({
     ? ogImage
     : `${origin}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`;
   
-  // BRAND-FIRST LOGIC: Ensure "Wellforged" is at the start of the title for brand queries
-  const brandPrefixedTitle = title.startsWith(siteName) 
+  // Title formatting: Append " | WellForged" if the title doesn't already contain it and isn't just "WellForged"
+  const formattedTitle = title === siteName || title.includes(siteName) 
     ? title 
-    : `${siteName} | ${title.replace(`${siteName} | `, "").replace(` | ${siteName}`, "")}`;
+    : `${title} | ${siteName}`;
 
   // Organization Schema (Knowledge Graph support)
   const organizationSchema = {
@@ -62,7 +62,7 @@ const SEO = ({
   return (
     <Helmet>
       {/* Basic Meta Tags */}
-      <title>{brandPrefixedTitle}</title>
+      <title>{formattedTitle}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
       
@@ -72,7 +72,7 @@ const SEO = ({
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:title" content={brandPrefixedTitle} />
+      <meta property="og:title" content={formattedTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImageUrl} />
       <meta property="og:site_name" content={siteName} />
@@ -80,7 +80,7 @@ const SEO = ({
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={canonicalUrl} />
-      <meta name="twitter:title" content={brandPrefixedTitle} />
+      <meta name="twitter:title" content={formattedTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImageUrl} />
       {twitterHandle && <meta name="twitter:site" content={twitterHandle} />}

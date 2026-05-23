@@ -152,8 +152,8 @@ const TransparencyPage = () => {
   return (
     <>
       <SEO 
-        title="Lab Reports & Batch Transparency"
-        description="Verify your Wellforged batch number to see independent lab results. We set the standard for radical transparency in wellness."
+        title="Verify Supplement Batch Reports | WellForged"
+        description="Enter your batch number to view authentic, independent NABL-certified third-party lab reports for every single product."
         canonical="/transparency"
       />
       <main className="min-h-screen bg-background flex flex-col page-pt">
