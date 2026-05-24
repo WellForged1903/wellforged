@@ -46,8 +46,8 @@ const SEO = ({
     "logo": {
       "@type": "ImageObject",
       "url": `${origin}/logo.png`,
-      "width": 271,
-      "height": 293
+      "width": 512,
+      "height": 512
     },
     "sameAs": [
       "https://www.instagram.com/wellforged",
