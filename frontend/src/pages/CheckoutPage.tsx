@@ -58,7 +58,8 @@ const CheckoutPage = () => {
     city: "",
     state: "",
   });
-  const [idempotencyKey] = useState(() => crypto.randomUUID());
+  const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
+  const regenerateIdempotencyKey = () => setIdempotencyKey(crypto.randomUUID());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const discount = appliedCoupon?.discount_amount || 0;
@@ -204,6 +205,7 @@ const CheckoutPage = () => {
         },
         modal: {
           ondismiss: () => {
+            regenerateIdempotencyKey(); // ⚡ Reset key for subsequent attempts
             const timeOpen = Date.now() - modalOpenedAt;
             // If the modal closes almost instantly (under 2 seconds), it was likely crashed by an Ad-Blocker blocking Razorpay's telemetry/validation.
             if (timeOpen < 2000) {
@@ -217,12 +219,14 @@ const CheckoutPage = () => {
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", (response: any) => {
+        regenerateIdempotencyKey(); // ⚡ Reset key on payment failure
         toast.error(`Payment failed: ${response.error.description || "Please try a different payment method."}`);
       });
       modalOpenedAt = Date.now();
       rzp.open();
 
     } catch (error) {
+      regenerateIdempotencyKey(); // ⚡ Reset key on failed order attempt
       const message = error instanceof Error ? error.message : "Something went wrong";
       toast.error(message);
     } finally {
