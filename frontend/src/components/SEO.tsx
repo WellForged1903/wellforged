@@ -13,8 +13,8 @@ interface SEOProps {
 }
 
 const SEO = ({
-  title = "Wellforged | The No Nonsense Supplement Brand",
-  description = "Pure ingredients, zero fillers, and absolute clarity. Wellforged is the no nonsense supplement brand built on integrity and evidence.",
+  title = "WellForged | The No-Nonsense Supplement Brand",
+  description = "The No-Nonsense Moringa powder — NABL-certified & independently tested every batch. Enter your batch number to access your lab reports. No fillers. Just proof.",
   canonical = "/",
   ogImage = "/Packaging_Updated.png",
   ogType = "website",
@@ -41,9 +41,14 @@ const SEO = ({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Wellforged",
+    "name": "WellForged",
     "url": origin,
-    "logo": `${origin}/logo.png`,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${origin}/logo.png`,
+      "width": 271,
+      "height": 293
+    },
     "sameAs": [
       "https://www.instagram.com/wellforged",
       "https://twitter.com/wellforged"

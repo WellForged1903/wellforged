@@ -27,7 +27,7 @@ const Index = () => {
         <>
             <SEO 
                 title="WellForged"
-                description="The No-Nonsense Supplement Brand"
+                description="The No-Nonsense Moringa powder — NABL-certified & independently tested every batch. Enter your batch number to access your lab reports. No fillers. Just proof."
                 canonical="/"
                 jsonLd={{
                     "@context": "https://schema.org",
