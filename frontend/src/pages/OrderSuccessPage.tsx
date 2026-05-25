@@ -84,8 +84,26 @@ const OrderSuccessPage = () => {
             </div>
           </div>
 
+          {/* Reassurance SLA Banner */}
+          <div className="mb-12 p-6 bg-primary/5 border border-primary/20 rounded-2xl text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-hero-fade-up-delay-4">
+            <div className="space-y-1">
+              <h4 className="font-display text-base font-semibold text-foreground flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                Uncompromising Support SLA
+              </h4>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                Need to modify details, track dispatch, or address a quality concern? Our legal Grievance Portal provides direct, verified dispute resolution with our Head of Customer Integrity.
+              </p>
+            </div>
+            <Link to="/support/grievance-redressal" className="w-full md:w-auto flex-shrink-0">
+              <Button variant="outline" className="w-full md:w-auto rounded-xl border-primary/20 hover:border-primary text-primary hover:bg-primary/5 text-xs font-semibold py-2">
+                Visit Grievance Desk
+              </Button>
+            </Link>
+          </div>
+
           <div className="animate-hero-fade-up-delay-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-<Link to="/">
+            <Link to="/">
               <Button variant="hero" size="xl" className="h-12 px-6 text-sm sm:h-14 sm:px-10 sm:text-lg">
                 Back to Home
               </Button>

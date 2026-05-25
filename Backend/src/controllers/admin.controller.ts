@@ -197,17 +197,50 @@ export const fulfillAdminOrder = async (req: Request, res: Response) => {
 
 export const updateAdminReviewStatus = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { status } = req.body; // 'approved' | 'rejected' | 'pending'
+    const { status, is_verified_purchase } = req.body; // 'approved' | 'rejected' | 'pending' or verified toggle
     try {
-        const result = await pool.query(
-            `UPDATE product_reviews SET status = $1 WHERE id = $2 RETURNING *`,
-            [status, id]
-        );
+        let query = 'UPDATE reviews SET ';
+        const values: any[] = [];
+        let paramIdx = 1;
+        
+        if (status !== undefined) {
+            // Automatically map 'approved' to 'published' to match the user-facing table expectations
+            const normalizedStatus = status === 'approved' ? 'published' : status;
+            query += `status = $${paramIdx}, `;
+            values.push(normalizedStatus);
+            paramIdx++;
+        }
+        if (is_verified_purchase !== undefined) {
+            query += `is_verified_purchase = $${paramIdx}, `;
+            values.push(is_verified_purchase);
+            paramIdx++;
+        }
+        
+        // Strip trailing comma
+        query = query.slice(0, -2);
+        
+        query += ` WHERE id = $${paramIdx} RETURNING *`;
+        values.push(id);
+        
+        const result = await pool.query(query, values);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
         res.json(deepNormalizePaths(result.rows[0]));
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getAdminReviews = async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query('SELECT * FROM reviews ORDER BY created_at DESC');
+        res.json(deepNormalizePaths(result.rows));
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 export const getAdminCoupons = async (req: Request, res: Response) => {
     try {
@@ -404,6 +437,75 @@ export const getAdminCustomers = async (req: Request, res: Response) => {
             ORDER BY lifetime_value DESC NULLS LAST
         `);
         res.json(deepNormalizePaths(result.rows));
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * GRIEVANCE CENTER
+ */
+export const getAdminGrievances = async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query('SELECT * FROM grievance_tickets ORDER BY created_at DESC');
+        res.json(deepNormalizePaths(result.rows));
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateAdminGrievanceStatus = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status, resolution_notes } = req.body; // 'pending' | 'in_progress' | 'resolved'
+    try {
+        let query = 'UPDATE grievance_tickets SET ';
+        const values: any[] = [];
+        let paramIdx = 1;
+
+        if (status !== undefined) {
+            query += `status = $${paramIdx}, `;
+            values.push(status);
+            paramIdx++;
+
+            if (status === 'resolved') {
+                query += `resolved_at = CURRENT_TIMESTAMP, `;
+            }
+        }
+
+        if (resolution_notes !== undefined) {
+            query += `resolution_notes = $${paramIdx}, `;
+            values.push(resolution_notes);
+            paramIdx++;
+        }
+
+        // Strip trailing comma and spaces
+        query = query.slice(0, -2);
+
+        query += ` WHERE id = $${paramIdx} RETURNING *`;
+        values.push(id);
+
+        const result = await pool.query(query, values);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Grievance ticket not found' });
+        }
+
+        const ticket = result.rows[0];
+
+        // Trigger automated email on resolution
+        if (status === 'resolved') {
+            try {
+                await MailerService.sendGrievanceResolved(
+                    ticket.email,
+                    ticket.customer_name,
+                    ticket.ticket_id,
+                    ticket.resolution_notes || ''
+                );
+            } catch (emailErr) {
+                console.warn('Failed to send resolution email:', emailErr);
+            }
+        }
+
+        res.json(deepNormalizePaths(ticket));
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }

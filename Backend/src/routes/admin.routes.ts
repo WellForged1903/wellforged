@@ -10,6 +10,7 @@ import {
     uploadAdminProductImage,
     fulfillAdminOrder,
     updateAdminReviewStatus,
+    getAdminReviews,
     createAdminCoupon,
     deleteAdminCoupon,
     getAdminCoupons,
@@ -22,6 +23,8 @@ import {
     saveAdminProductFaqs,
     getAdminOrderDetails,
     getAdminCustomers,
+    getAdminGrievances,
+    updateAdminGrievanceStatus,
     deleteAdminSku,
     getAdminProducts
 } from '../controllers/admin.controller.js';
@@ -74,7 +77,12 @@ router.patch('/orders/:id/fulfill', fulfillAdminOrder);
 router.get('/customers', getAdminCustomers);
 
 // ─── Reviews (Moderation) ───────────────────────────────────────
+router.get('/reviews', getAdminReviews);
 router.patch('/reviews/:id/status', updateAdminReviewStatus);
+
+// ─── Grievances (Resolution) ────────────────────────────────────
+router.get('/grievances', getAdminGrievances);
+router.patch('/grievances/:id/status', updateAdminGrievanceStatus);
 
 // ─── Coupons ─────────────────────────────────────────────────────
 router.get('/coupons', getAdminCoupons);

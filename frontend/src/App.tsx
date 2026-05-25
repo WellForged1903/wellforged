@@ -23,6 +23,7 @@ const TermsConditions = lazy(() => import("./pages/legal/TermsConditions"));
 const RefundPolicy = lazy(() => import("./pages/legal/RefundPolicy"));
 const ShippingPolicy = lazy(() => import("./pages/legal/ShippingPolicy"));
 const ContactUs = lazy(() => import("./pages/legal/ContactUs"));
+const GrievancePortal = lazy(() => import("./pages/legal/GrievancePortal"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 
@@ -61,6 +62,7 @@ const App = () => (
                                         <Route path="/refund-policy" element={<RefundPolicy />} />
                                         <Route path="/shipping-policy" element={<ShippingPolicy />} />
                                         <Route path="/contact" element={<ContactUs />} />
+                                        <Route path="/support/grievance-redressal" element={<GrievancePortal />} />
 
                                         <Route path="/order-success" element={<OrderSuccessPage />} />
                                         <Route path="/admin/login" element={<AdminLogin />} />

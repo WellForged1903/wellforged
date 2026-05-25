@@ -50,7 +50,7 @@ const SEO = ({
       "height": 512
     },
     "sameAs": [
-      "https://www.instagram.com/wellforged",
+      "https://www.instagram.com/wellforged_/",
       "https://twitter.com/wellforged"
     ],
     "contactPoint": {

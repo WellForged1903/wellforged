@@ -25,6 +25,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
   // Form State
   const [rating, setRating] = useState(5);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
@@ -86,16 +87,18 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
         body: JSON.stringify({
           product_id: productId,
           customer_name: name,
+          email: email.trim() || undefined,
           rating,
           comment,
         }),
       });
 
       if (res.ok) {
-        setSubmitMessage("Thank you for your feedback!");
+        setSubmitMessage("Thank you! Your review has been submitted for moderation and will appear once approved.");
         setShowForm(false);
         setRating(5);
         setName("");
+        setEmail("");
         setComment("");
         fetchReviews(); // Refresh the list
       } else {
@@ -186,6 +189,22 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
                   onChange={(e) => setName(e.target.value)}
                   className="w-full rounded-xl border border-border bg-secondary/50 px-5 py-4 text-base focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                   placeholder="John Doe"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span>Email</span>
+                  <span className="text-[10px] text-muted-foreground font-normal normal-case italic">
+                    (Optional - enter checkout email to auto-verify your purchase)
+                  </span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-secondary/50 px-5 py-4 text-base focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                  placeholder="john@example.com"
                 />
               </div>
 

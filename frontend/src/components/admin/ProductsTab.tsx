@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Upload, RefreshCcw, Plus, Trash2, Info, HelpCircle, AlertTriangle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, RefreshCcw, Plus, Trash2, Info, HelpCircle, AlertTriangle, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { Product, apiFetch } from "./AdminTypes";
 import { API_BASE_URL } from "@/config";
@@ -10,16 +10,31 @@ interface Props {
 }
 
 const ProductsTab = ({ products, onRefresh }: Props) => {
-    const [mode, setMode] = useState<'list' | 'add-product' | 'add-sku' | 'stock' | 'metadata' | 'faqs'>('list');
+    const [mode, setMode] = useState<'list' | 'add-product' | 'edit-product' | 'add-sku' | 'stock' | 'metadata' | 'faqs'>('list');
     const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+    const [categories, setCategories] = useState<any[]>([]);
     const [metaItems, setMetaItems] = useState([{ category: 'Highlights', key: '', value: '', icon_name: '', display_order: 0 }]);
     const [faqItems, setFaqItems] = useState([{ question: '', answer: '', is_active: true, display_order: 0 }]);
-    const [productForm, setProductForm] = useState({ name: '', slug: '', base_description: '', is_active: true });
+    const [productForm, setProductForm] = useState({ name: '', slug: '', base_description: '', category_id: '', is_active: true });
+    const [editProductForm, setEditProductForm] = useState({ id: '', name: '', slug: '', base_description: '', category_id: '', is_active: true });
     const [skuForm, setSkuForm] = useState({ product_id: '', sku_code: '', label: '', price: '', original_price: '', stock: '' });
     const [stockForm, setStockForm] = useState({ sku_id: '', adjustment: '' });
     const [uploading, setUploading] = useState(false);
     const [imageForm, setImageForm] = useState({ product_id: '', is_main: false, display_order: '0' });
     const fileRef = useRef<HTMLInputElement>(null);
+
+    const fetchCategories = async () => {
+        try {
+            const res = await apiFetch('/api/admin/categories');
+            if (res.ok) setCategories(await res.json());
+        } catch (err) {
+            console.error('Failed to load categories');
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
@@ -47,8 +62,38 @@ const ProductsTab = ({ products, onRefresh }: Props) => {
 
     const handleProductSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await submit('/api/admin/products', productForm);
-        setProductForm({ name: '', slug: '', base_description: '', is_active: true });
+        await submit('/api/admin/products', {
+            ...productForm,
+            category_id: productForm.category_id || null
+        });
+        setProductForm({ name: '', slug: '', base_description: '', category_id: '', is_active: true });
+    };
+
+    const handleEditProductSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await apiFetch(`/api/admin/products/${editProductForm.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: editProductForm.name,
+                    slug: editProductForm.slug,
+                    base_description: editProductForm.base_description,
+                    category_id: editProductForm.category_id || null,
+                    is_active: editProductForm.is_active
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success('Product updated!');
+                onRefresh();
+                setMode('list');
+            } else {
+                toast.error(data.message || 'Failed to update product');
+            }
+        } catch (err) {
+            toast.error('Network error');
+        }
     };
 
     const handleSkuSubmit = async (e: React.FormEvent) => {
@@ -179,6 +224,17 @@ const ProductsTab = ({ products, onRefresh }: Props) => {
                                     <p className="text-xs text-neutral-500 font-mono">{p.slug}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
+                                    <button onClick={() => { 
+                                        setEditProductForm({
+                                            id: p.id,
+                                            name: p.name,
+                                            slug: p.slug,
+                                            base_description: p.base_description || '',
+                                            category_id: p.category_id || '',
+                                            is_active: p.is_active
+                                        });
+                                        setMode('edit-product');
+                                    }} className="p-2 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl hover:bg-amber-500/20 transition-all" title="Edit Product Info"><Pencil className="h-4 w-4" /></button>
                                     <button onClick={() => { setSelectedProductId(p.id); setMode('metadata'); }} className="p-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500/20 transition-all" title="Edit Metadata"><Info className="h-4 w-4" /></button>
                                     <button onClick={() => { setSelectedProductId(p.id); setMode('faqs'); }} className="p-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-xl hover:bg-purple-500/20 transition-all" title="Edit FAQs"><HelpCircle className="h-4 w-4" /></button>
                                     <button onClick={() => handleDeleteProduct(p.id, p.name)} className="p-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition-all" title="Delete Product"><Trash2 className="h-4 w-4" /></button>
@@ -237,6 +293,17 @@ const ProductsTab = ({ products, onRefresh }: Props) => {
                             </div>
                         </div>
                         <div className="space-y-1.5">
+                            <label className={labelCls}>Category</label>
+                            <select
+                                value={productForm.category_id}
+                                onChange={e => setProductForm({...productForm, category_id: e.target.value})}
+                                className={inputCls}
+                            >
+                                <option value="">No Category</option>
+                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
                             <label className={labelCls}>Description</label>
                             <textarea required value={productForm.base_description} onChange={e => setProductForm({...productForm, base_description: e.target.value})} rows={3} placeholder="Product description..." className="w-full bg-[#0d0d0d] border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-amber-500/40 transition-colors resize-none" />
                         </div>
@@ -278,6 +345,47 @@ const ProductsTab = ({ products, onRefresh }: Props) => {
                             </button>
                         </form>
                     </div>
+                </div>
+            )}
+
+            {mode === 'edit-product' && (
+                <div className="bg-[#141414] border border-neutral-800 rounded-2xl p-6 space-y-4 max-w-2xl animate-in fade-in slide-in-from-bottom-2">
+                    <h3 className="font-bold text-white">Edit Product Details</h3>
+                    <form onSubmit={handleEditProductSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <label className={labelCls}>Name</label>
+                                <input required value={editProductForm.name} onChange={e => setEditProductForm({...editProductForm, name: e.target.value, slug: slugify(e.target.value)})} placeholder="e.g. Ashwagandha Powder" className={inputCls} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className={labelCls}>Slug</label>
+                                <input required value={editProductForm.slug} onChange={e => setEditProductForm({...editProductForm, slug: slugify(e.target.value)})} placeholder="auto-generated" className={inputCls} />
+                            </div>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelCls}>Category</label>
+                            <select
+                                value={editProductForm.category_id}
+                                onChange={e => setEditProductForm({...editProductForm, category_id: e.target.value})}
+                                className={inputCls}
+                            >
+                                <option value="">No Category</option>
+                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelCls}>Description</label>
+                            <textarea required value={editProductForm.base_description} onChange={e => setEditProductForm({...editProductForm, base_description: e.target.value})} rows={3} placeholder="Product description..." className="w-full bg-[#0d0d0d] border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-amber-500/40 transition-colors resize-none" />
+                        </div>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked={editProductForm.is_active} onChange={e => setEditProductForm({...editProductForm, is_active: e.target.checked})} className="accent-amber-500" />
+                            <span className="text-sm text-neutral-300">Active (visible on store)</span>
+                        </label>
+                        <div className="flex gap-3 pt-2">
+                            <button type="button" onClick={() => setMode('list')} className="h-11 px-6 border border-neutral-700 rounded-xl text-neutral-400 hover:text-white transition-colors text-sm font-semibold">Cancel</button>
+                            <button type="submit" className="h-11 px-6 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl text-sm transition-colors">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
             )}
 

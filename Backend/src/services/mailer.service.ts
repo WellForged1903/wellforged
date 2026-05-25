@@ -442,6 +442,82 @@ class MailerService {
             ...template,
         });
     }
+
+    static async sendGrievanceReceived(
+        email: string,
+        customerName: string,
+        ticketId: string,
+        category: string
+    ): Promise<void> {
+        const subject = `[WellForged] Grievance Registered: ${ticketId}`;
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <h2 style="color: #23503D; border-bottom: 2px solid #23503D; padding-bottom: 10px;">Grievance Acknowledgement</h2>
+                <p>Dear ${customerName},</p>
+                <p>We have officially registered your grievance ticket regarding <strong>${category}</strong>.</p>
+                <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #D4A545;">
+                    <p style="margin: 0; font-weight: bold; font-size: 16px;">Ticket ID: ${ticketId}</p>
+                    <p style="margin: 5px 0 0 0; color: #555;">Status: Pending Investigation</p>
+                </div>
+                <p>Our designated Grievance Officer has been notified and is currently investigating your concern. As per our legal SLA commitment under the Consumer Protection (E-Commerce) Rules, 2020:</p>
+                <ul>
+                    <li>We will officially acknowledge your grievance within <strong>48 hours</strong>.</li>
+                    <li>We will provide a complete resolution or formal update within <strong>30 days</strong>.</li>
+                </ul>
+                <p>You can track the live status of your complaint at any time on our website using your Ticket ID and Email.</p>
+                <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; font-size: 12px; color: #777;">
+                    Warm regards,<br />
+                    <strong>Grievance Redressal Team</strong><br />
+                    WellForged Health and Wellness
+                </p>
+            </div>
+        `;
+        const textContent = `Dear ${customerName},\n\nWe have registered your grievance ticket regarding ${category}.\n\nTicket ID: ${ticketId}\nStatus: Pending Investigation\n\nOur designated Grievance Officer is currently investigating. We will acknowledge within 48 hours and resolve within 30 days.\n\nWarm regards,\nGrievance Redressal Team\nWellForged`;
+        
+        await this.sendEmail({
+            to: { email, name: customerName },
+            subject,
+            htmlContent,
+            textContent
+        });
+    }
+
+    static async sendGrievanceResolved(
+        email: string,
+        customerName: string,
+        ticketId: string,
+        resolutionNotes: string
+    ): Promise<void> {
+        const subject = `[WellForged] Grievance Resolved: ${ticketId}`;
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <h2 style="color: #23503D; border-bottom: 2px solid #23503D; padding-bottom: 10px;">Grievance Resolution</h2>
+                <p>Dear ${customerName},</p>
+                <p>We are writing to inform you that your grievance ticket <strong>${ticketId}</strong> has been officially resolved by our Grievance Redressal Officer.</p>
+                <div style="background-color: #f4fcf7; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #10b981; border: 1px solid #d1fae5;">
+                    <p style="margin: 0; font-weight: bold; font-size: 16px; color: #065f46;">Ticket ID: ${ticketId}</p>
+                    <p style="margin: 5px 0 10px 0; color: #047857; font-weight: 600; font-size: 14px;">Status: Resolved</p>
+                    <hr style="border: 0; border-top: 1px solid #a7f3d0; margin: 10px 0;" />
+                    <p style="margin: 0; font-weight: bold; color: #065f46; font-size: 13px; text-transform: uppercase;">Official Resolution Action:</p>
+                    <p style="margin: 5px 0 0 0; color: #1f2937; line-height: 1.5; font-style: italic;">"${resolutionNotes}"</p>
+                </div>
+                <p>If you have any further questions or if this concern has not been addressed to your satisfaction, please feel free to reopen it or file a follow-up query.</p>
+                <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; font-size: 12px; color: #777;">
+                    Warm regards,<br />
+                    <strong>Grievance Redressal Team</strong><br />
+                    WellForged Health and Wellness
+                </p>
+            </div>
+        `;
+        const textContent = `Dear ${customerName},\n\nYour grievance ticket ${ticketId} has been resolved.\n\nResolution Action:\n"${resolutionNotes}"\n\nWarm regards,\nGrievance Redressal Team\nWellForged`;
+        
+        await this.sendEmail({
+            to: { email, name: customerName },
+            subject,
+            htmlContent,
+            textContent
+        });
+    }
 }
 
 export default MailerService;

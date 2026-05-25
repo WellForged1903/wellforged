@@ -5,6 +5,6 @@ import { authenticate } from '../middlewares/auth.middleware.js';
 const router = Router();
 
 router.post('/validate', validateCoupon);
-router.get('/', authenticate, getAllCoupons);
+router.get('/', getAllCoupons);
 
 export default router;

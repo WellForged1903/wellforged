@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import SEO from "@/components/SEO";
 import {
     LayoutDashboard, Package, ClipboardList, ShieldCheck, Tag,
-    Star, Menu, RefreshCcw, FolderTree
+    Star, Menu, RefreshCcw, FolderTree, ShieldAlert
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -18,8 +18,9 @@ import BatchesTab from "@/components/admin/BatchesTab";
 import MarketingTab from "@/components/admin/MarketingTab";
 import CategoriesTab from "@/components/admin/CategoriesTab";
 import CouponsTab from "@/components/admin/CouponsTab";
+import GrievancesTab from "@/components/admin/GrievancesTab";
 
-type AdminTab = 'overview' | 'orders' | 'products' | 'categories' | 'coupons' | 'batches' | 'marketing';
+type AdminTab = 'overview' | 'orders' | 'products' | 'categories' | 'coupons' | 'batches' | 'marketing' | 'grievances';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState<AdminTab>('overview');
@@ -31,25 +32,98 @@ const AdminDashboard = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
 
-    const fetchAllData = async () => {
-        setIsLoading(true);
+    const ordersRef = useRef<Order[]>([]);
+    useEffect(() => {
+        ordersRef.current = orders;
+    }, [orders]);
+
+    const fetchAllData = async (silent = false) => {
+        if (!silent) setIsLoading(true);
         try {
             const [ordRes, prodRes] = await Promise.all([
                 apiFetch('/api/orders/admin/all'),
                 apiFetch('/api/admin/products/all'),
             ]);
             
-            if (ordRes.ok) setOrders(await ordRes.json());
+            if (ordRes.ok) {
+                const newOrders = await ordRes.json();
+                
+                // Compare with previous orders count to trigger real-time sound/toast alert
+                const prevOrders = ordersRef.current;
+                if (silent && prevOrders.length > 0 && newOrders.length > prevOrders.length) {
+                    const newCount = newOrders.length - prevOrders.length;
+                    toast.success(`${newCount} new order${newCount > 1 ? 's' : ''} received!`, {
+                        description: "Dashboard updated in real-time.",
+                        duration: 8000
+                    });
+                    
+                    // Subtle professional notification chime
+                    try {
+                        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
+                        audio.volume = 0.25;
+                        audio.play();
+                    } catch (soundErr) {
+                        // Safe fallback for autoplay policies
+                    }
+                }
+                setOrders(newOrders);
+            }
             if (prodRes.ok) setProducts(await prodRes.json());
         } catch (error) {
-            toast.error('Connection failed. Please check your network.');
+            if (!silent) {
+                toast.error('Connection failed. Please check your network.');
+            }
         } finally {
-            setIsLoading(false);
+            if (!silent) setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchAllData();
+        // Initial Explicit Fetch
+        fetchAllData(false);
+
+        const POLLING_INTERVAL_MS = 20000; // Poll every 20 seconds
+        let intervalId: NodeJS.Timeout;
+
+        const startPolling = () => {
+            intervalId = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    fetchAllData(true);
+                }
+            }, POLLING_INTERVAL_MS);
+        };
+
+        const stopPolling = () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+
+        // Handle page tab active status
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                fetchAllData(true); // Catch up instantly
+                startPolling();
+            } else {
+                stopPolling();
+            }
+        };
+
+        // Handle window focus gain
+        const handleFocus = () => {
+            fetchAllData(true); // Sync instantly on window focus
+        };
+
+        if (document.visibilityState === 'visible') {
+            startPolling();
+        }
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("focus", handleFocus);
+
+        return () => {
+            stopPolling();
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            window.removeEventListener("focus", handleFocus);
+        };
     }, []);
 
     const handleLogout = async () => {
@@ -64,6 +138,8 @@ const AdminDashboard = () => {
         { id: 'categories', label: 'Categories',  icon: FolderTree },
         { id: 'coupons',   label: 'Coupons',     icon: Tag },
         { id: 'batches',   label: 'Lab Batches', icon: ShieldCheck },
+        { id: 'marketing', label: 'Marketing & Reviews', icon: Star },
+        { id: 'grievances', label: 'Grievance Center', icon: ShieldAlert },
     ];
 
     return (
@@ -117,6 +193,7 @@ const AdminDashboard = () => {
                     { activeTab === 'coupons' && <CouponsTab /> }
                     { activeTab === 'batches' && <BatchesTab products={products} /> }
                     { activeTab === 'marketing' && <MarketingTab /> }
+                    { activeTab === 'grievances' && <GrievancesTab /> }
                 </main>
             </div>
         </div>

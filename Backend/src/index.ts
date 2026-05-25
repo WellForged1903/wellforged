@@ -18,6 +18,7 @@ import reviewRoutes from "./routes/review.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import grievanceRoutes from "./routes/grievance.routes.js";
 
 import { errorHandler } from "./middlewares/error.middleware.js";
 
@@ -101,6 +102,7 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/grievances", grievanceRoutes);
 app.use("/api", productRoutes);
 
 
