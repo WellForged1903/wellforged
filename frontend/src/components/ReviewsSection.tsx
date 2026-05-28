@@ -235,44 +235,105 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-      <div className="mx-auto max-w-[1440px] px-[var(--space-sm)] lg:px-[var(--space-md)]">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
-        {/* Premium Header & Stats */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 gap-8">
-          <div className="flex flex-col items-start text-left">
-            <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-6">Real Results</h2>
-            <div className="flex items-center gap-5">
-              <div className="flex flex-col">
-                <span className="font-display text-5xl sm:text-6xl font-bold text-foreground leading-none">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <span className="inline-block font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-primary mb-3 font-semibold">Quality Endorsements</span>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground">Customer Satisfaction</h2>
+        </div>
+
+        {/* Centered Rating Summary Panel */}
+        <div className="max-w-md mx-auto w-full mb-12 animate-in fade-in duration-500">
+          <div className="premium-panel flex flex-col justify-between bg-gradient-to-b from-background to-secondary/20 border-border/60 p-6 sm:p-8 shadow-xl rounded-3xl relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
+            {/* Decorative border highlight */}
+            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            
+            <div className="space-y-6 sm:space-y-8">
+              {/* Score */}
+              <div className="flex items-center gap-4 sm:gap-6 justify-center text-left">
+                <span className="font-display text-5xl sm:text-6xl font-bold text-foreground leading-none tracking-tight">
                   {Number(stats.averageRating).toFixed(1)}
                 </span>
-              </div>
-              <div className="flex flex-col justify-center gap-1.5">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                        i < Math.round(stats.averageRating) ? "fill-primary text-primary" : "fill-muted text-muted-foreground"
-                      }`}
-                    />
-                  ))}
+                <div className="space-y-1 sm:space-y-2">
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`h-4.5 w-4.5 sm:h-5 sm:w-5 ${i < Math.round(stats.averageRating) ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`} />
+                    ))}
+                  </div>
+                  <p className="font-body text-xs sm:text-sm font-semibold text-muted-foreground">Based on {stats.totalReviews} verified reviews</p>
                 </div>
-                <span className="font-body text-sm sm:text-base font-medium text-muted-foreground">
-                  Based on {stats.totalReviews} verified reviews
-                </span>
+              </div>
+
+              {/* Star Distribution Graph */}
+              <div className="space-y-2.5 sm:space-y-3 pt-4 border-t border-border/40">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">5 Star</span>
+                  <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${fiveStarPct}%` }} />
+                  </div>
+                  <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{fiveStarPct}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">4 Star</span>
+                  <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full opacity-60" style={{ width: `${fourStarPct}%` }} />
+                  </div>
+                  <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{fourStarPct}%</span>
+                </div>
+                <div className={`flex items-center gap-3 ${threeStarPct > 0 ? "" : "opacity-30"}`}>
+                  <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">3 Star</span>
+                  <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full opacity-40" style={{ width: `${threeStarPct}%` }} />
+                  </div>
+                  <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{threeStarPct}%</span>
+                </div>
+                <div className={`flex items-center gap-3 ${twoStarPct > 0 ? "" : "opacity-30"}`}>
+                  <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">2 Star</span>
+                  <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full opacity-20" style={{ width: `${twoStarPct}%` }} />
+                  </div>
+                  <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{twoStarPct}%</span>
+                </div>
+                <div className={`flex items-center gap-3 ${oneStarPct > 0 ? "" : "opacity-30"}`}>
+                  <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">1 Star</span>
+                  <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full opacity-10" style={{ width: `${oneStarPct}%` }} />
+                  </div>
+                  <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{oneStarPct}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-4 pt-6 border-t border-border/40">
+              <div className="flex items-start gap-2.5 bg-primary/5 border border-primary/10 rounded-2xl p-4">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <p className="font-body text-xs text-primary font-semibold leading-relaxed text-left">
+                  Ratings are linked directly to unique transactions, verified email checkouts, and NABL batch analysis.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={() => {
+                    setSubmitMessage("");
+                    setShowForm(!showForm);
+                  }}
+                  variant="outline"
+                  className="flex-1 border-primary/20 text-primary hover:bg-primary/5 rounded-2xl py-6 font-display text-xs font-bold uppercase tracking-widest"
+                >
+                  {showForm ? "Cancel Review" : "Write a Review"}
+                </Button>
+                
+                <a
+                  href="/reviews"
+                  className="flex-1 inline-flex items-center justify-center font-display text-xs font-bold uppercase tracking-widest text-primary-foreground bg-primary hover:bg-primary/95 py-3.5 rounded-2xl transition-all shadow-sm"
+                >
+                  Read All Reviews
+                </a>
               </div>
             </div>
           </div>
-          
-          <Button 
-            variant="outline" 
-            className="w-full md:w-auto gap-2 border-primary/20 text-primary hover:bg-primary/5 rounded-full px-8 py-6 text-base shadow-sm hover:shadow-md transition-all"
-            onClick={() => setShowForm(!showForm)}
-          >
-            <MessageSquare className="h-5 w-5" />
-            {showForm ? "Cancel Review" : "Write a Review"}
-          </Button>
         </div>
 
         {/* Review Form */}
@@ -350,71 +411,6 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
             </p>
           </div>
         )}
-
-        {/* Horizontal Auto-swiping Review Feed */}
-        <div className="w-full min-w-0 overflow-hidden">
-          <div 
-            ref={scrollRef}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onTouchStart={() => setIsHovered(true)}
-            onTouchEnd={() => setIsHovered(false)}
-            className="relative flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth pb-8 hide-scroll pt-4 px-6 sm:px-12 md:px-20 lg:px-6"
-          >
-            {(reviews || []).map((review, i) => {
-              const isActive = i === activeIndex;
-              return (
-                <div 
-                  key={review.id} 
-                  ref={(el) => { cardRefs.current[i] = el; }}
-                  className={`snap-center flex-shrink-0 w-[270px] sm:w-[380px] rounded-3xl border p-6 sm:p-8 flex flex-col transition-all duration-500 ease-out ${
-                    isActive 
-                      ? "scale-105 opacity-100 z-10 border-primary/30 shadow-[0_20px_50px_-20px_rgba(26,60,52,0.35)] bg-background" 
-                      : "scale-95 opacity-40 blur-[0.4px] bg-background/80 border-border/80"
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex gap-1">
-                      {[...Array(5)].map((_, idx) => (
-                        <Star
-                          key={idx}
-                          className={`h-4 w-4 sm:h-5 sm:w-5 ${idx < review.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[10px] sm:text-xs font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-                      {new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                  </div>
-                  
-                  <p className="font-body text-sm sm:text-base text-foreground leading-relaxed flex-grow mb-8 italic">
-                    "{review.comment}"
-                  </p>
-                  
-                  <div className="flex items-center gap-4 mt-auto pt-5 border-t border-border/50">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-display text-sm sm:text-base font-bold text-foreground">{review.customer_name}</span>
-                      {review.is_verified_purchase && (
-                        <span className="flex items-center gap-1.5 font-body text-[10px] sm:text-xs text-primary font-semibold mt-0.5">
-                          <CheckCircle className="h-3.5 w-3.5" /> Verified Buyer
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            
-            {reviews.length === 0 && (
-              <div className="w-full py-20 text-center text-muted-foreground font-medium text-lg">
-                No reviews yet. Be the first to share your experience!
-              </div>
-            )}
-          </div>
-        </div>
 
       </div>
     </section>
