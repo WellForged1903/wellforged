@@ -390,6 +390,8 @@ const ProductPage = () => {
           </div>
         </section>
 
+        {product && <ReviewsSection productId={product.id.toString()} />}
+
         {/* Section 1: Philosophy (Why We Chose Moringa) */}
         <section className="premium-hover-gold border-y border-border/50 bg-secondary/15 py-16 sm:py-24">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -607,8 +609,6 @@ const ProductPage = () => {
             </ScrollReveal>
           </div>
         </section>
-
-        {product && <ReviewsSection productId={product.id.toString()} />}
 
       {/* Sticky Mobile Add-to-Cart Footer */}
       <div 
