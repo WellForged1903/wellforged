@@ -40,7 +40,7 @@ const ProductPage = () => {
   const touchEndX = useRef(0);
   const selectorRef = useRef<HTMLDivElement>(null);
   const [showStickyCTA, setShowStickyCTA] = useState(false);
-  const [reviewStats, setReviewStats] = useState({ totalReviews: 158, averageRating: 4.9 });
+  const [reviewStats, setReviewStats] = useState({ totalReviews: 0, averageRating: 0.0 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,20 +53,14 @@ const ProductPage = () => {
           const res = await fetch(`${API_BASE_URL}/api/reviews/${product.id}?t=${Date.now()}`);
           if (res.ok) {
             const data = await res.json();
-            const dbReviews = data.reviews || [];
-            if (dbReviews.length > 0) {
-              const combinedTotal = data.stats.totalReviews + 158;
-              const combinedAvg = ((data.stats.averageRating * data.stats.totalReviews + 4.9 * 158) / combinedTotal).toFixed(1);
-              setReviewStats({
-                totalReviews: combinedTotal,
-                averageRating: Number(combinedAvg)
-              });
-            } else {
-              setReviewStats({ totalReviews: 158, averageRating: 4.9 });
-            }
+            setReviewStats({
+              totalReviews: data.stats.totalReviews,
+              averageRating: data.stats.averageRating
+            });
           }
         } catch (e) {
           console.error("Failed to fetch review stats");
+          setReviewStats({ totalReviews: 0, averageRating: 0.0 });
         }
       };
       fetchStats();

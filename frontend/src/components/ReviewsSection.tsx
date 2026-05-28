@@ -41,7 +41,7 @@ const FALLBACK_REVIEWS: Review[] = [
 
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [stats, setStats] = useState({ totalReviews: 158, averageRating: 4.9 });
+  const [stats, setStats] = useState({ totalReviews: 0, averageRating: 0.0 });
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   
@@ -66,29 +66,16 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
         const data = await res.json();
         const dbReviews = data.reviews || [];
         
-        let merged = [...dbReviews];
-        if (dbReviews.length < 3) {
-          const needed = 3 - dbReviews.length;
-          const fallbacksToAdd = FALLBACK_REVIEWS.slice(0, needed);
-          merged = [...dbReviews, ...fallbacksToAdd];
-        }
-        setReviews(merged);
-
-        if (dbReviews.length > 0) {
-          const combinedTotal = data.stats.totalReviews + 158;
-          const combinedAvg = ((data.stats.averageRating * data.stats.totalReviews + 4.9 * 158) / combinedTotal).toFixed(1);
-          setStats({
-            totalReviews: combinedTotal,
-            averageRating: Number(combinedAvg)
-          });
-        } else {
-          setStats({ totalReviews: 158, averageRating: 4.9 });
-        }
+        setReviews(dbReviews);
+        setStats({
+          totalReviews: data.stats.totalReviews,
+          averageRating: data.stats.averageRating
+        });
       }
     } catch (e) {
       console.error("Failed to fetch reviews");
-      setReviews(FALLBACK_REVIEWS);
-      setStats({ totalReviews: 158, averageRating: 4.9 });
+      setReviews([]);
+      setStats({ totalReviews: 0, averageRating: 0.0 });
     } finally {
       setIsLoading(false);
     }

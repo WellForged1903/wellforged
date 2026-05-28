@@ -42,7 +42,7 @@ const FALLBACK_REVIEWS: Review[] = [
 
 const HomeReviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [stats, setStats] = useState({ totalReviews: 158, averageRating: 4.9 });
+  const [stats, setStats] = useState({ totalReviews: 0, averageRating: 0.0 });
   const [isLoading, setIsLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isIntersecting, setIsIntersecting] = useState(false);
@@ -57,31 +57,16 @@ const HomeReviews = () => {
         const data = await res.json();
         const dbReviews = data.reviews || [];
         
-        // Merge DB reviews with fallback reviews if there are fewer than 3 DB reviews
-        let merged = [...dbReviews];
-        if (dbReviews.length < 3) {
-          const needed = 3 - dbReviews.length;
-          const fallbacksToAdd = FALLBACK_REVIEWS.slice(0, needed);
-          merged = [...dbReviews, ...fallbacksToAdd];
-        }
-        setReviews(merged);
-
-        // Calculate combined high-fidelity trust stats
-        if (dbReviews.length > 0) {
-          const combinedTotal = data.stats.totalReviews + 158;
-          const combinedAvg = ((data.stats.averageRating * data.stats.totalReviews + 4.9 * 158) / combinedTotal).toFixed(1);
-          setStats({
-            totalReviews: combinedTotal,
-            averageRating: Number(combinedAvg)
-          });
-        } else {
-          setStats({ totalReviews: 158, averageRating: 4.9 });
-        }
+        setReviews(dbReviews);
+        setStats({
+          totalReviews: data.stats.totalReviews,
+          averageRating: data.stats.averageRating
+        });
       }
     } catch (e) {
       console.error("Failed to fetch homepage reviews");
-      setReviews(FALLBACK_REVIEWS);
-      setStats({ totalReviews: 158, averageRating: 4.9 });
+      setReviews([]);
+      setStats({ totalReviews: 0, averageRating: 0.0 });
     } finally {
       setIsLoading(false);
     }
@@ -195,8 +180,12 @@ const HomeReviews = () => {
   if (isLoading) return <div className="py-16 text-center text-muted-foreground animate-pulse">Loading verified reviews...</div>;
 
   // Star distribution helper based on rating
-  const fiveStarPct = Math.round((reviews.filter(r => r.rating === 5).length / reviews.length) * 100);
-  const fourStarPct = 100 - fiveStarPct;
+  const total = reviews.length;
+  const fiveStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 5).length / total) * 100) : 0;
+  const fourStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 4).length / total) * 100) : 0;
+  const threeStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 3).length / total) * 100) : 0;
+  const twoStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 2).length / total) * 100) : 0;
+  const oneStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 1).length / total) * 100) : 0;
 
   return (
     <section 
@@ -241,7 +230,7 @@ const HomeReviews = () => {
                     <div className="space-y-1 sm:space-y-2">
                       <div className="flex gap-0.5">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-4.5 w-4.5 sm:h-5 sm:w-5 fill-primary text-primary" />
+                          <Star key={i} className={`h-4.5 w-4.5 sm:h-5 sm:w-5 ${i < Math.round(stats.averageRating) ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`} />
                         ))}
                       </div>
                       <p className="font-body text-xs sm:text-sm font-semibold text-muted-foreground">Based on {stats.totalReviews} verified reviews</p>
@@ -264,10 +253,26 @@ const HomeReviews = () => {
                       </div>
                       <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{fourStarPct}%</span>
                     </div>
-                    <div className="flex items-center gap-3 opacity-30">
+                    <div className={`flex items-center gap-3 ${threeStarPct > 0 ? "" : "opacity-30"}`}>
                       <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">3 Star</span>
-                      <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden" />
-                      <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">0%</span>
+                      <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                        <div className="h-full bg-primary rounded-full opacity-40" style={{ width: `${threeStarPct}%` }} />
+                      </div>
+                      <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{threeStarPct}%</span>
+                    </div>
+                    <div className={`flex items-center gap-3 ${twoStarPct > 0 ? "" : "opacity-30"}`}>
+                      <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">2 Star</span>
+                      <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                        <div className="h-full bg-primary rounded-full opacity-20" style={{ width: `${twoStarPct}%` }} />
+                      </div>
+                      <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{twoStarPct}%</span>
+                    </div>
+                    <div className={`flex items-center gap-3 ${oneStarPct > 0 ? "" : "opacity-30"}`}>
+                      <span className="font-mono text-[10px] w-10 text-left text-muted-foreground">1 Star</span>
+                      <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                        <div className="h-full bg-primary rounded-full opacity-10" style={{ width: `${oneStarPct}%` }} />
+                      </div>
+                      <span className="font-mono text-[10px] text-foreground font-bold w-8 text-right">{oneStarPct}%</span>
                     </div>
                   </div>
                 </div>
