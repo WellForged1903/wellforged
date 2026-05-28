@@ -97,7 +97,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return updatedItems;
     });
 
-    toast.success(`Added to cart`);
+    toast.success(`Added to cart`, { duration: 2000 });
     
     trackEvent("add_to_cart", {
       item_id: newItem.id,

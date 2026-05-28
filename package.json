@@ -12,7 +12,8 @@
         "build": "npm run build --workspaces --if-present",
         "test": "npm run test --workspaces --if-present",
         "test:e2e": "npm run test:e2e --workspace=frontend",
-        "deploy": "powershell -ExecutionPolicy Bypass -File scripts/sync-deploy.ps1",
-        "deploy:msg": "powershell -ExecutionPolicy Bypass -File scripts/sync-deploy.ps1 -CommitMessage"
+        "test:all": "npm run test:all --prefix testing-suite",
+        "deploy": "bash scripts/sync-deploy.sh",
+        "deploy:msg": "bash scripts/sync-deploy.sh"
     }
 }

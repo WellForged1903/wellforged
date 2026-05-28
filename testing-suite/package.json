@@ -1,0 +1,21 @@
+{
+  "name": "wellforged-testing-suite",
+  "version": "1.0.0",
+  "description": "Isolated End-to-End, Data Flow, Admin CRM, and DB Resilience Testing Suite for WellForged",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:resilience": "tsx scripts/test-db-resilience.ts",
+    "test:e2e": "playwright test",
+    "test:all": "bash run-all-tests.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1",
+    "@types/node": "^20.11.24",
+    "@types/pg": "^8.11.2",
+    "dotenv": "^16.4.5",
+    "pg": "^8.11.3",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}

@@ -8,7 +8,6 @@ const Footer = () => {
     { name: "Products", href: "/product" },
     { name: "Transparency", href: "/transparency" },
     { name: "Journal (Blog)", href: "/blog" },
-    { name: "Contact Us", href: "/contact-us" },
   ];
   const socialLinks = [
     { icon: Instagram, href: "https://www.instagram.com/wellforged_/", label: "Instagram" },
@@ -63,7 +62,7 @@ const Footer = () => {
                 <li><Link to="/refund-policy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Refund & Cancellation</Link></li>
                 <li><Link to="/shipping-policy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Shipping Policy</Link></li>
                 <li><Link to="/contact" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Contact Us</Link></li>
-                <li><Link to="/support/grievance-redressal" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Grievance Redressal</Link></li>
+                <li><Link to="/support/grievance-redressal" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Care & Resolution Hub</Link></li>
             </ul>
           </div>
 

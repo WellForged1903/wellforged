@@ -315,7 +315,7 @@ const AboutUs = () => {
                         Verify Batch <ArrowRight className="h-4 w-4 text-gold" />
                       </Button>
                     </Link>
-                    <Link to="/product">
+                    <Link to="/product" onClick={() => window.scrollTo(0, 0)}>
                       <Button variant="default" size="lg" className="bg-secondary hover:bg-secondary/80 text-foreground font-bold uppercase tracking-wider text-xs px-8 h-[52px] border border-border/80">
                         View Products
                       </Button>

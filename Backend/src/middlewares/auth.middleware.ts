@@ -16,6 +16,11 @@ declare global {
 // ADMIN MIDDLEWARE (HTTP-Only Cookie based JWT)
 // =============================================================================
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+    // Bypass authentication for CORS preflight OPTIONS requests
+    if (req.method === 'OPTIONS') {
+        return next();
+    }
+
     try {
         const token = req.cookies.admin_token;
 

@@ -32,7 +32,7 @@ export const getBatchReport = async (req: any, res: Response) => {
         const batch = deepNormalizePaths(batchResult.rows[0]);
 
         const resultsResult = await pool.query(
-            `SELECT test_name as name, test_value as result, unit, pass_status as status 
+            `SELECT test_name as name, test_value as result, unit, pass_status as status, safe_limit as limit 
              FROM report_test_results 
              WHERE batch_id = $1 
              ORDER BY created_at ASC`,
@@ -48,6 +48,8 @@ export const getBatchReport = async (req: any, res: Response) => {
         res.json({
             batchNumber: batch.batch_number,
             productName: batch.productName,
+            manufactureDate: batch.mfg_date,
+            expirationDate: batch.exp_date,
             testDate: batch.testing_date,
             labName: batch.tested_by || 'WellForged Lab',
             labReportUrl: batch.lab_report_url || null,
@@ -78,7 +80,7 @@ export const getInventoryLogs = async (req: Request, res: Response) => {
 };
 
 export const createBatchReport = async (req: Request, res: Response) => {
-    const { product_id, batch_number, testing_date, tested_by, lab_report_url, test_results } = req.body;
+    const { product_id, batch_number, testing_date, tested_by, lab_report_url, mfg_date, exp_date, test_results } = req.body;
 
     if (!Array.isArray(test_results)) {
         return res.status(400).json({ message: 'test_results must be an array' });
@@ -90,17 +92,17 @@ export const createBatchReport = async (req: Request, res: Response) => {
         await client.query('BEGIN');
 
         const batchResult = await client.query(
-            `INSERT INTO report_batches (product_id, batch_number, testing_date, tested_by, lab_report_url) 
-             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [product_id, batch_number, testing_date, tested_by, lab_report_url]
+            `INSERT INTO report_batches (product_id, batch_number, testing_date, tested_by, lab_report_url, mfg_date, exp_date) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [product_id, batch_number, testing_date, tested_by, lab_report_url, mfg_date || null, exp_date || null]
         );
         const batch = batchResult.rows[0];
 
         for (const test of test_results) {
             await client.query(
-                `INSERT INTO report_test_results (batch_id, test_name, test_value, unit, pass_status) 
-                 VALUES ($1, $2, $3, $4, $5)`,
-                [batch.id, test.test_name, test.test_value, test.unit, test.pass_status ?? true]
+                `INSERT INTO report_test_results (batch_id, test_name, test_value, unit, pass_status, safe_limit) 
+                 VALUES ($1, $2, $3, $4, $5, $6)`,
+                [batch.id, test.test_name, test.test_value, test.unit, test.pass_status ?? true, test.safe_limit || null]
             );
         }
 

@@ -67,6 +67,10 @@ export const createOrder = async (req: any, res: Response) => {
             }
 
             for (const gItem of guest_items) {
+                const qty = Number(gItem.quantity);
+                if (isNaN(qty) || !Number.isInteger(qty) || qty <= 0) {
+                    throw new Error('Quantity must be a positive integer');
+                }
                 const skuResult = await client.query(
                     `SELECT s.price, s.stock, s.label, p.name AS product_name
                      FROM skus s
@@ -79,7 +83,7 @@ export const createOrder = async (req: any, res: Response) => {
                 }
                 itemsToProcess.push({
                     sku_id: gItem.sku_id,
-                    quantity: gItem.quantity,
+                    quantity: qty,
                     price: skuResult.rows[0].price,
                     stock: skuResult.rows[0].stock,
                     label: skuResult.rows[0].label,
@@ -139,16 +143,37 @@ export const createOrder = async (req: any, res: Response) => {
         let discount_amount = 0;
         if (coupon_id) {
             const couponResult = await client.query(
-                'SELECT * FROM coupons WHERE id = $1 AND expires_at > CURRENT_TIMESTAMP',
+                'SELECT * FROM coupons WHERE id = $1',
                 [coupon_id]
             );
-            if (couponResult.rows.length > 0) {
-                const coupon = couponResult.rows[0];
-                if (coupon.discount_type === 'percentage') {
-                    discount_amount = Math.floor((subtotal * coupon.discount_value) / 100);
-                } else {
-                    discount_amount = coupon.discount_value;
+            if (couponResult.rows.length === 0) {
+                throw new Error('Invalid or expired coupon code');
+            }
+            const coupon = couponResult.rows[0];
+
+            if (!coupon.is_active) {
+                throw new Error('Coupon is inactive');
+            }
+
+            if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+                throw new Error('Coupon has expired');
+            }
+
+            if (coupon.min_order_value && subtotal < Number(coupon.min_order_value)) {
+                throw new Error(`Minimum order amount of Rs ${Number(coupon.min_order_value).toLocaleString()} required`);
+            }
+
+            if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
+                throw new Error('Coupon usage limit reached');
+            }
+
+            if (coupon.discount_type === 'percentage') {
+                discount_amount = Math.floor((subtotal * Number(coupon.discount_value)) / 100);
+                if (coupon.max_discount_amount && discount_amount > Number(coupon.max_discount_amount)) {
+                    discount_amount = Number(coupon.max_discount_amount);
                 }
+            } else if (coupon.discount_type === 'fixed') {
+                discount_amount = Number(coupon.discount_value);
             }
         }
 

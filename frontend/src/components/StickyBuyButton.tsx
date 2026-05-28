@@ -31,7 +31,7 @@ const StickyBuyButton = () => {
           variant="hero"
           size="default"
           className="h-11 flex-shrink-0 gap-1.5 px-4 text-xs font-bold uppercase tracking-[0.14em]"
-          onClick={() => navigate("/product")}
+          onClick={() => { navigate("/product"); window.scrollTo(0, 0); }}
         >
           <ShoppingCart className="h-4 w-4" />
           View Product

@@ -25,10 +25,24 @@ const CartDrawer = () => {
     }
   }, [isOpen]);
 
+  const getCouponDiscountInRupees = (coupon: any, orderValue: number) => {
+    if (!coupon) return 0;
+    const val = Number(coupon.discount_value);
+    if (coupon.discount_type === 'percentage') {
+      const discount = (orderValue * val) / 100;
+      const maxAmt = coupon.max_discount_amount ? Number(coupon.max_discount_amount) : null;
+      return maxAmt && discount > maxAmt ? maxAmt : discount;
+    }
+    return val;
+  };
+
   // Find the highest currently unlocked coupon and the next available coupon
-  const unlockedCoupons = coupons.filter(c => !c.min_order_value || subtotal >= c.min_order_value).sort((a, b) => b.min_order_value - a.min_order_value);
-  const lockedCoupons = coupons.filter(c => c.min_order_value && subtotal < c.min_order_value).sort((a, b) => a.min_order_value - b.min_order_value);
-  
+  const unlockedCoupons = coupons
+    .filter(c => !c.min_order_value || subtotal >= Number(c.min_order_value))
+    .sort((a, b) => getCouponDiscountInRupees(b, subtotal) - getCouponDiscountInRupees(a, subtotal));
+  const lockedCoupons = coupons
+    .filter(c => c.min_order_value && subtotal < Number(c.min_order_value))
+    .sort((a, b) => Number(a.min_order_value) - Number(b.min_order_value));
   const currentBest = unlockedCoupons.length > 0 ? unlockedCoupons[0] : null;
   const nextGoal = lockedCoupons.length > 0 ? lockedCoupons[0] : null;
 
@@ -37,12 +51,12 @@ const CartDrawer = () => {
 
   if (nextGoal) {
     const amountNeeded = nextGoal.min_order_value - subtotal;
-    const discountText = nextGoal.discount_type === 'percentage' ? `${nextGoal.discount_value}%` : `Rs ${nextGoal.discount_value}`;
-    progressMessage = `Add Rs ${amountNeeded.toLocaleString()} more to unlock ${discountText} OFF!`;
+    const discountRupees = getCouponDiscountInRupees(nextGoal, nextGoal.min_order_value);
+    progressMessage = `Add Rs ${amountNeeded.toLocaleString()} more to avail Rs ${discountRupees.toLocaleString()} discount!`;
     progressPercentage = Math.min(100, (subtotal / nextGoal.min_order_value) * 100);
   } else if (currentBest) {
-    const discountText = currentBest.discount_type === 'percentage' ? `${currentBest.discount_value}%` : `Rs ${currentBest.discount_value}`;
-    progressMessage = `You've unlocked ${discountText} OFF!`;
+    const discountRupees = getCouponDiscountInRupees(currentBest, subtotal);
+    progressMessage = `You've unlocked Rs ${discountRupees.toLocaleString()} discount!`;
     progressPercentage = 100;
   } else {
     // Fallback if no coupons exist
@@ -68,7 +82,7 @@ const CartDrawer = () => {
             <ShoppingBag className="mb-[var(--space-md)] h-[var(--space-3xl)] w-[var(--space-3xl)] text-muted-foreground/30" />
             <p className="mb-[var(--space-xs)] font-display text-[var(--text-2xl)] font-bold text-foreground">Your cart is empty</p>
             <p className="mb-[var(--space-xl)] font-body text-[var(--text-base)] text-muted-foreground">Add a verified WellForged pack to begin your daily ritual.</p>
-            <Link to="/product" className="w-full" onClick={() => setIsOpen(false)}>
+            <Link to="/product" className="w-full" onClick={() => { setIsOpen(false); window.scrollTo(0, 0); }}>
               <Button variant="hero" size="lg" className="h-[var(--space-xl)] w-full gap-2 font-bold uppercase tracking-widest">
                 Shop Now <ArrowRight className="h-5 w-5" />
               </Button>
@@ -148,8 +162,8 @@ const CartDrawer = () => {
                 <p className="mt-1 font-body text-[11px] text-muted-foreground">Taxes included. Shipping remains complimentary.</p>
               </div>
 
-              <Link to="/checkout" onClick={() => setIsOpen(false)}>
-                <Button variant="hero" size="lg" className="btn-glow animate-pulse-subtle active:scale-[0.98] transition-transform h-12 w-full gap-2 font-bold uppercase tracking-[0.14em] sm:h-[var(--space-xl)]">
+              <Link to="/checkout" onClick={() => setIsOpen(false)} className="w-full">
+                <Button variant="hero" size="lg" className="btn-glow animate-pulse-subtle active:scale-[0.98] transition-transform h-13 sm:h-14 py-4 w-full gap-2 font-bold uppercase tracking-[0.14em]">
                   Proceed to Checkout
                   <ArrowRight className="h-5 w-5" />
                 </Button>
@@ -157,7 +171,7 @@ const CartDrawer = () => {
 
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-full pt-1 text-center font-body text-[var(--text-sm)] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
+                className="w-full h-12 sm:h-13 flex items-center justify-center font-body text-xs font-bold uppercase tracking-[0.14em] rounded-xl border border-gold bg-[#fcfbf9] text-[#1A3C34] hover:bg-gold hover:text-white transition-all duration-300 active:scale-[0.98]"
               >
                 Continue Shopping
               </button>

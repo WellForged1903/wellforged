@@ -11,6 +11,7 @@ const IntegrityPillars = lazy(() => import("@/components/IntegrityPillars"));
 const ProcessTimeline = lazy(() => import("@/components/ProcessTimeline"));
 const TamilNaduTerroir = lazy(() => import("@/components/TamilNaduTerroir"));
 const WhyWeExist = lazy(() => import("@/components/WhyWeExist"));
+const HomeReviews = lazy(() => import("@/components/HomeReviews"));
 
 const ManifestoCTA = lazy(() => import("@/components/ManifestoCTA"));
 
@@ -45,6 +46,7 @@ const Index = () => {
                 <Navbar />
                 <ManifestoHero />
                 <Suspense fallback={<SectionFallback />}>
+                    <HomeReviews />
                     <TrustComparison />
                     <NABLVerification />
                     <IntegrityPillars />

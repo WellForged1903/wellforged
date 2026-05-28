@@ -78,9 +78,9 @@ export const addAdminSku = async (req: Request, res: Response) => {
     const { product_id, sku_code, label, price, original_price, stock } = req.body;
     try {
         const result = await pool.query(
-            `INSERT INTO skus (product_id, sku_code, label, price, original_price, stock) 
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [product_id, sku_code, label, price, original_price, stock || 0]
+            `INSERT INTO skus (product_id, sku_code, label, price, original_price, stock, total_stock) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [product_id, sku_code, label, price, original_price, stock || 0, stock || 0]
         );
         res.status(201).json(deepNormalizePaths(result.rows[0]));
     } catch (error: any) {
@@ -92,10 +92,21 @@ export const updateAdminSkuStock = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { adjustment } = req.body; // e.g., +10 or -5
     try {
-        const result = await pool.query(
-            `UPDATE skus SET stock = stock + $1 WHERE id = $2 RETURNING *`,
-            [adjustment, id]
-        );
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        const identifierColumn = isUuid ? 'id' : 'sku_code';
+        let query;
+        let params;
+        
+        // If restocking (adding stock), add to both current stock and total stock
+        if (Number(adjustment) > 0) {
+            query = `UPDATE skus SET stock = stock + $1, total_stock = total_stock + $1 WHERE ${identifierColumn} = $2 RETURNING *`;
+            params = [adjustment, id];
+        } else {
+            query = `UPDATE skus SET stock = stock + $1 WHERE ${identifierColumn} = $2 RETURNING *`;
+            params = [adjustment, id];
+        }
+
+        const result = await pool.query(query, params);
         if (result.rows.length === 0) return res.status(404).json({ message: 'SKU not found' });
         res.json(deepNormalizePaths(result.rows[0]));
     } catch (error: any) {
@@ -106,7 +117,9 @@ export const updateAdminSkuStock = async (req: Request, res: Response) => {
 export const deleteAdminSku = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        await pool.query('DELETE FROM skus WHERE id = $1', [id]);
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        const identifierColumn = isUuid ? 'id' : 'sku_code';
+        await pool.query(`DELETE FROM skus WHERE ${identifierColumn} = $1`, [id]);
         res.json({ message: 'SKU deleted successfully' });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
@@ -312,12 +325,12 @@ export const getAllCategories = async (req: Request, res: Response) => {
 };
 
 export const createAdminCategory = async (req: Request, res: Response) => {
-    const { name, slug, description, is_active } = req.body;
+    const { name, slug, description } = req.body;
     try {
         const result = await pool.query(
-            `INSERT INTO categories (name, slug, description, is_active) 
-             VALUES ($1, $2, $3, $4) RETURNING *`,
-            [name, slug, description, is_active ?? true]
+            `INSERT INTO categories (name, slug, description) 
+             VALUES ($1, $2, $3) RETURNING *`,
+            [name, slug, description]
         );
         res.status(201).json(deepNormalizePaths(result.rows[0]));
     } catch (error: any) {
@@ -327,16 +340,15 @@ export const createAdminCategory = async (req: Request, res: Response) => {
 
 export const updateAdminCategory = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, slug, description, is_active } = req.body;
+    const { name, slug, description } = req.body;
     try {
         const result = await pool.query(
             `UPDATE categories 
              SET name = COALESCE($1, name), 
                  slug = COALESCE($2, slug), 
-                 description = COALESCE($3, description), 
-                 is_active = COALESCE($4, is_active)
-             WHERE id = $5 RETURNING *`,
-            [name, slug, description, is_active, id]
+                 description = COALESCE($3, description)
+             WHERE id = $4 RETURNING *`,
+            [name, slug, description, id]
         );
         res.json(deepNormalizePaths(result.rows[0]));
     } catch (error: any) {

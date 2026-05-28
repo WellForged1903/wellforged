@@ -15,6 +15,7 @@ const ProductPage = lazy(() => import("./pages/ProductPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
+const BlogArticlePage = lazy(() => import("./pages/BlogArticlePage"));
 const OrderSuccessPage = lazy(() => import("./pages/OrderSuccessPage"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
@@ -54,6 +55,7 @@ const App = () => (
                                         <Route path="/product" element={<ProductPage />} />
                                         <Route path="/about" element={<AboutPage />} />
                                         <Route path="/blog" element={<BlogIndex />} />
+                                        <Route path="/blog/:slug" element={<BlogArticlePage />} />
                                         <Route path="/checkout" element={<CheckoutPage />} />
                                         
                                         {/* Legal Pages */}

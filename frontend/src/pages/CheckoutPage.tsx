@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import SEO from "@/components/SEO";
-import { Truck, Shield, CheckCircle, MapPin, Tag, X, User, Mail, Phone, Building, Hash } from "lucide-react";
+import { Truck, Shield, CheckCircle, MapPin, Tag, X, User, Mail, Phone, Building, Hash, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
@@ -13,7 +13,7 @@ import type { CouponValidationResult } from "@/types/store";
 import { loadRazorpay } from "@/utils/razorpay";
 
 const CheckoutPage = () => {
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, clearCart, setIsOpen } = useCart();
   const navigate = useNavigate();
   const [coupons, setCoupons] = useState<any[]>([]);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponValidationResult | null>(null);
@@ -21,17 +21,31 @@ const CheckoutPage = () => {
   // Dynamic Suggestion Logic
   const getSuggestedCoupon = () => {
     if (coupons.length === 0) return null;
-    // Find the best coupon that meets min_order_value
-    const eligible = coupons
-        .filter(c => !c.min_order_value || subtotal >= c.min_order_value)
-        .sort((a, b) => b.min_order_value - a.min_order_value); // Get the one with highest requirement/value
+    // Find all eligible coupons
+    const eligible = coupons.filter(c => !c.min_order_value || subtotal >= Number(c.min_order_value));
     
     if (eligible.length === 0) return null;
-    const best = eligible[0];
+
+    const getDiscountInRupees = (c: any) => {
+      const val = Number(c.discount_value);
+      if (c.discount_type === 'percentage') {
+        const discount = (subtotal * val) / 100;
+        const maxAmt = c.max_discount_amount ? Number(c.max_discount_amount) : null;
+        return maxAmt && discount > maxAmt ? maxAmt : discount;
+      }
+      return val;
+    };
+    
+    // Sort eligible coupons by actual discount amount in rupees, descending
+    const sorted = eligible.sort((a, b) => getDiscountInRupees(b) - getDiscountInRupees(a));
+
+    const best = sorted[0];
+    const actualDiscount = getDiscountInRupees(best);
+
     return {
         code: best.code,
-        discount: best.discount_type === 'percentage' ? `${best.discount_value}%` : `Rs ${best.discount_value}`,
-        minSubtotal: best.min_order_value
+        discount: `Rs ${actualDiscount.toFixed(0)}`,
+        minSubtotal: Number(best.min_order_value)
     };
   };
 
@@ -240,10 +254,26 @@ const CheckoutPage = () => {
       <Navbar />
       <main className="page-pt min-h-screen bg-background pb-[var(--space-xl)]">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          
+          {/* Smart Back Navigation Button */}
+          <div className="mb-6 flex justify-start">
+            <button
+              onClick={() => {
+                setIsOpen(true);
+                navigate("/product");
+                window.scrollTo(0, 0);
+              }}
+              className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-primary hover:underline hover:text-primary/80 transition-all border border-primary/20 bg-primary/5 hover:bg-primary/10 px-4 py-2 rounded-xl"
+            >
+              <ChevronLeft className="h-4 w-4 animate-pulse" />
+              Back to Cart
+            </button>
+          </div>
+
           {items.length === 0 ? (
             <div className="py-16 text-center">
               <p className="mb-4 font-body text-lg text-muted-foreground">Your cart is empty</p>
-              <Button variant="hero" onClick={() => navigate("/product")}>
+              <Button variant="hero" onClick={() => { navigate("/product"); window.scrollTo(0, 0); }}>
                 Continue Shopping
               </Button>
             </div>

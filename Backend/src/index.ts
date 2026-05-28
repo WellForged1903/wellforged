@@ -19,6 +19,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import grievanceRoutes from "./routes/grievance.routes.js";
+import blogRoutes from "./routes/blog.routes.js";
 
 import { errorHandler } from "./middlewares/error.middleware.js";
 
@@ -72,10 +73,14 @@ app.use(
 
 // ---------------- MIDDLEWARE ----------------
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser()); // Required for reading HTTP-Only auth cookies
 app.use(helmet());
-app.use(limiter);
+
+if (process.env.DISABLE_RATE_LIMITER !== "true" && process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development") {
+    app.use(limiter);
+}
 
 
 
@@ -103,6 +108,7 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/grievances", grievanceRoutes);
+app.use("/api/blog", blogRoutes);
 app.use("/api", productRoutes);
 
 
@@ -134,8 +140,14 @@ async function testDatabase() {
     try {
         const res = await pool.query("SELECT NOW()");
         logger.info(`Database connected at ${res.rows[0].now}`);
-    } catch (error) {
-        logger.error("Database connection failed", { error });
+
+        // Self-healing database schema integrity check
+        logger.info("Auditing database schema integrity...");
+        await pool.query("ALTER TABLE skus ADD COLUMN IF NOT EXISTS total_stock INTEGER DEFAULT 0;");
+        await pool.query("UPDATE skus SET total_stock = stock WHERE total_stock = 0 OR total_stock IS NULL;");
+        logger.info("Database schema check complete: total_stock is active.");
+    } catch (error: any) {
+        logger.error("Database schema check failed", { error: error.message });
     }
 }
 

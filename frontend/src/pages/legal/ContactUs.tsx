@@ -16,17 +16,9 @@ const ContactUs = () => {
       </p>
       <ul>
         <li><strong>Email:</strong> <a href="mailto:hello@wellforged.in">hello@wellforged.in</a></li>
-        <li><strong>Phone:</strong> +91 98765 43210 (Mon-Fri, 10:00 AM - 6:00 PM IST)</li>
+        <li><strong>Phone:</strong> 9870278977 (Mon-Fri, 10:00 AM - 6:00 PM IST)</li>
+        <li><strong>Address:</strong> F - $7</li>
       </ul>
-
-      <h2>Registered Address</h2>
-      <p>
-        <strong>WellForged Health and Wellness</strong><br />
-        123 Corporate Avenue, Block C<br />
-        New Delhi, 110001<br />
-        India
-      </p>
-      <p><em>Please note: We do not process returns or exchanges at our corporate office address. Please refer to our Refund Policy for return instructions.</em></p>
 
       <h2>Grievance Redressal Mechanism</h2>
       <p>

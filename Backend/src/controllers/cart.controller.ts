@@ -29,6 +29,11 @@ export const getCart = async (req: any, res: Response) => {
 export const addToCart = async (req: any, res: Response) => {
     const { sku_id, quantity } = req.body;
 
+    const qty = Number(quantity);
+    if (isNaN(qty) || !Number.isInteger(qty) || qty <= 0) {
+        return res.status(400).json({ message: "Quantity must be a positive integer" });
+    }
+
     try {
         // Add or update item directly in cart_items using profile_id
         const itemResult = await pool.query(
@@ -37,7 +42,7 @@ export const addToCart = async (req: any, res: Response) => {
        ON CONFLICT (profile_id, sku_id) 
        DO UPDATE SET quantity = cart_items.quantity + $3
        RETURNING *`,
-            [req.user.id, sku_id, quantity]
+            [req.user.id, sku_id, qty]
         );
 
         res.status(201).json(itemResult.rows[0]);
@@ -50,10 +55,15 @@ export const updateCartItem = async (req: any, res: Response) => {
     const { id } = req.params;
     const { quantity } = req.body;
 
+    const qty = Number(quantity);
+    if (isNaN(qty) || !Number.isInteger(qty) || qty <= 0) {
+        return res.status(400).json({ message: "Quantity must be a positive integer" });
+    }
+
     try {
         const result = await pool.query(
             'UPDATE cart_items SET quantity = $1 WHERE id = $2 AND profile_id = $3 RETURNING *',
-            [quantity, id, req.user.id]
+            [qty, id, req.user.id]
         );
 
         if (result.rows.length === 0) {
@@ -97,6 +107,15 @@ export const bulkAddToCart = async (req: any, res: Response) => {
 
     if (!Array.isArray(items)) {
         return res.status(400).json({ message: 'items must be an array' });
+    }
+
+    // Validate all items first
+    for (const item of items) {
+        const qty = Number(item.quantity);
+        if (isNaN(qty) || !Number.isInteger(qty) || qty <= 0) {
+            return res.status(400).json({ message: "Quantity must be a positive integer for all items" });
+        }
+        item.quantity = qty; // Store normalized value
     }
 
     const client = await pool.connect();

@@ -473,24 +473,24 @@ const TransparencyPage = () => {
               ) : searchedBatch ? (
                 <div className="space-y-12 animate-fade-up">
                   
+                  {/* Verify Another Batch Action - Left Aligned */}
+                  <div className="flex justify-start mb-2">
+                    <button 
+                      onClick={() => {
+                        setHasSearched(false);
+                        setSearchedBatch(null);
+                        setNotFound(false);
+                        window.scrollTo({ top: 0, behavior: "instant" });
+                      }} 
+                      className="premium-pill border-gold/20 bg-gold/5 hover:border-gold/40 px-5 py-2.5 flex items-center gap-2 group text-[10px] tracking-wider font-mono text-muted-foreground hover:text-gold transition-all duration-300"
+                    >
+                      <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300 text-gold" />
+                      <span>VERIFY ANOTHER BATCH</span>
+                    </button>
+                  </div>
+
                   {/* Sleek Certificate Header */}
                   <div className="text-center">
-                    {/* Verify Another Batch Action */}
-                    <div className="mb-6">
-                      <button 
-                        onClick={() => {
-                          setHasSearched(false);
-                          setSearchedBatch(null);
-                          setNotFound(false);
-                          window.scrollTo({ top: 0, behavior: "instant" });
-                        }} 
-                        className="premium-pill border-gold/20 bg-gold/5 hover:border-gold/40 px-5 py-2.5 flex items-center gap-2 group text-[10px] tracking-wider font-mono text-muted-foreground hover:text-gold transition-all duration-300 mx-auto"
-                      >
-                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300 text-gold" />
-                        <span>VERIFY ANOTHER BATCH</span>
-                      </button>
-                    </div>
-
                     <div className="premium-pill border-emerald-500/25 bg-emerald-500/5 px-4 py-1.5 mb-4 inline-flex">
                       <span className="font-mono text-[10px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1.5">
                         <CheckCircle className="h-4 w-4" /> CERTIFICATE OF ANALYSIS VERIFIED

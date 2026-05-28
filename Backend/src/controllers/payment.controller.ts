@@ -65,19 +65,57 @@ export const verifyPayment = async (req: Request, res: Response) => {
     );
 
     for (const item of itemsResult.rows) {
+      // ⚡ Lock the SKU row for update to prevent concurrent payment race conditions
+      const skuCheck = await client.query(
+        'SELECT stock FROM skus WHERE id = $1 FOR UPDATE',
+        [item.sku_id]
+      );
+
+      if (skuCheck.rows.length === 0) {
+        throw new Error(`SKU ${item.sku_id} not found during checkout`);
+      }
+
+      if (skuCheck.rows[0].stock < item.quantity) {
+        throw new Error(`Insufficient stock for SKU ${item.sku_id} (requested ${item.quantity}, available ${skuCheck.rows[0].stock})`);
+      }
+
       await client.query(
         'UPDATE skus SET stock = stock - $1 WHERE id = $2',
         [item.quantity, item.sku_id]
       );
     }
 
-    // 4.5 Increment Coupon used_count if applied
+    // 4.5 Validate and Increment Coupon used_count if applied
     if (order.coupon_id) {
+        // Lock the coupon row for update to prevent concurrent payment validation race conditions
+        const couponCheck = await client.query(
+            'SELECT max_uses, used_count, code, expires_at, is_active FROM coupons WHERE id = $1 FOR UPDATE',
+            [order.coupon_id]
+        );
+
+        if (couponCheck.rows.length === 0) {
+            throw new Error(`Coupon ${order.coupon_id} not found during payment verification`);
+        }
+
+        const coupon = couponCheck.rows[0];
+
+        if (!coupon.is_active) {
+            throw new Error(`Coupon ${coupon.code} is inactive`);
+        }
+
+        if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+            throw new Error(`Coupon ${coupon.code} has expired`);
+        }
+
+        if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
+            throw new Error(`Coupon usage limit reached for code ${coupon.code}`);
+        }
+
         await client.query(
             'UPDATE coupons SET used_count = used_count + 1 WHERE id = $1',
             [order.coupon_id]
         );
-        logger?.info?.(`Coupon ${order.coupon_id} used_count incremented`);
+        logger?.info?.(`Coupon ${coupon.code} used_count incremented`);
     }
 
     // Clear cart for the user

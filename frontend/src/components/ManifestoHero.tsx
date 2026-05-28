@@ -63,7 +63,7 @@ const ManifestoHero = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-[var(--space-sm)]">
-            <Link to="/product" className="w-full sm:w-auto">
+            <Link to="/product" className="w-full sm:w-auto" onClick={() => window.scrollTo(0, 0)}>
               <Button variant="hero" size="xl" className="h-12 sm:h-14 px-6 sm:px-10 text-sm sm:text-base font-bold uppercase tracking-[0.14em] sm:tracking-[0.18em] group w-full">
                 Buy Moringa
                 <ShoppingBag className="h-5 w-5 ml-2 transition-transform group-hover:scale-110" />

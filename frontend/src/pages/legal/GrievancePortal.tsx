@@ -169,7 +169,7 @@ const GrievancePortal = () => {
   };
 
   return (
-    <LegalPageLayout title="Grievance Redressal Mechanism" lastUpdated="May 2026">
+    <LegalPageLayout title="Wellforged Care" lastUpdated="May 2026">
       <p className="text-base text-muted-foreground leading-relaxed">
         At WellForged, we stand by complete transparency and product integrity. Under the Consumer Protection (E-Commerce) Rules, 2020, we provide a formal mechanism to address all customer grievances. If you experience issues with product quality, testing disparities, payment failures, delivery delays, or cancellations, please lodge an official ticket below.
       </p>
@@ -180,9 +180,8 @@ const GrievancePortal = () => {
         <div className="space-y-1">
           <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">Our Legal Resolution Promise</h4>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Every grievance is routed directly to our designated Grievance Officer, **Dr. Aravind Swamy (Head of Customer Integrity)**. We officially acknowledge every ticket within **48 hours** and provide a final resolution statement within **30 days**.
+            Every grievance is routed directly to our designated Resolution Officer. We officially acknowledge every ticket within 48 hours and provide a final resolution statement within 30 days. Email: hello@wellforged.in | Mobile : 9870278977
           </p>
-          <p className="text-[10px] text-muted-foreground/80 font-mono pt-1">Officer Email: grievance@wellforged.in | Address: 123 Corporate Avenue, New Delhi, India</p>
         </div>
       </div>
 

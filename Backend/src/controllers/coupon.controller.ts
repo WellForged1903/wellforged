@@ -64,7 +64,13 @@ export const validateCoupon = async (req: Request, res: Response) => {
 
 export const getAllCoupons = async (_req: Request, res: Response) => {
   try {
-    const result = await pool.query("SELECT * FROM coupons WHERE is_active = true ORDER BY min_order_value ASC");
+    const result = await pool.query(
+      `SELECT * FROM coupons 
+       WHERE is_active = true 
+       AND (expires_at IS NULL OR expires_at >= CURRENT_TIMESTAMP)
+       AND (max_uses IS NULL OR used_count < max_uses)
+       ORDER BY min_order_value ASC`
+    );
     return res.json(result.rows);
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
