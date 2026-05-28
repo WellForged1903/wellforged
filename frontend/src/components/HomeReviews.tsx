@@ -286,15 +286,9 @@ const HomeReviews = () => {
                     </p>
                   </div>
                   
-                  {/* Link to Product Reviews */}
+                  {/* Link to Dedicated Reviews Page */}
                   <Link 
-                    to="/product" 
-                    onClick={() => {
-                      window.scrollTo(0, 0);
-                      setTimeout(() => {
-                        document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" });
-                      }, 100);
-                    }}
+                    to="/reviews" 
                     className="inline-flex items-center justify-between w-full font-display text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 hover:bg-primary/10 border border-primary/15 hover:border-primary/20 px-5 py-4 rounded-2xl transition-all"
                   >
                     View All Reviews <ArrowRight className="h-4 w-4" />
