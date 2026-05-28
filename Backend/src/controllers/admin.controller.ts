@@ -89,7 +89,7 @@ export const addAdminSku = async (req: Request, res: Response) => {
 };
 
 export const updateAdminSkuStock = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = typeof req.params.id === 'string' ? req.params.id : '';
     const { adjustment } = req.body; // e.g., +10 or -5
     try {
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
@@ -115,7 +115,7 @@ export const updateAdminSkuStock = async (req: Request, res: Response) => {
 };
 
 export const deleteAdminSku = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = typeof req.params.id === 'string' ? req.params.id : '';
     try {
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
         const identifierColumn = isUuid ? 'id' : 'sku_code';
