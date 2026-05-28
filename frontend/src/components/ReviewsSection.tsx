@@ -116,36 +116,87 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
     };
   }, [isLoading]);
 
-  // Auto-advance active index every 3 seconds (only when intersecting)
-  useEffect(() => {
-    if (reviews.length <= 1 || !isIntersecting) return;
-    
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % reviews.length);
-    }, 3000);
-    
-    return () => clearInterval(interval);
-  }, [reviews, isIntersecting]);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Center active index on change (guarded by isIntersecting to prevent offscreen jumps)
-  useEffect(() => {
-    if (reviews.length === 0 || !scrollRef.current || !isIntersecting) return;
+  const triggerSmoothScroll = (targetIndex: number) => {
+    if (!scrollRef.current) return;
     const container = scrollRef.current;
-    const activeCard = cardRefs.current[activeIndex];
+    const activeCard = cardRefs.current[targetIndex];
     if (activeCard) {
+      setIsScrolling(true);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+
       const cardOffsetLeft = activeCard.offsetLeft;
       const cardWidth = activeCard.clientWidth;
       const containerWidth = container.clientWidth;
-      
-      // Calculate scrollLeft that aligns activeCard exactly in the center of the viewport
       const targetScrollLeft = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2);
       
       container.scrollTo({
         left: targetScrollLeft,
         behavior: "smooth"
       });
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 600);
     }
-  }, [activeIndex, reviews, isIntersecting]);
+  };
+
+  // Auto-advance active index every 4 seconds (only when intersecting and not hovered)
+  useEffect(() => {
+    if (reviews.length <= 1 || !isIntersecting || isHovered) return;
+    
+    const interval = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % reviews.length;
+      setActiveIndex(nextIndex);
+      triggerSmoothScroll(nextIndex);
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [reviews, isIntersecting, isHovered, activeIndex]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current || reviews.length === 0 || isScrolling) return;
+    const container = scrollRef.current;
+    const scrollLeft = container.scrollLeft;
+    const containerWidth = container.clientWidth;
+    
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    
+    cardRefs.current.forEach((card, idx) => {
+      if (card) {
+        const cardCenter = card.offsetLeft + card.clientWidth / 2;
+        const containerCenter = scrollLeft + containerWidth / 2;
+        const distance = Math.abs(cardCenter - containerCenter);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = idx;
+        }
+      }
+    });
+    
+    if (closestIndex !== activeIndex) {
+      setActiveIndex(closestIndex);
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [activeIndex, isScrolling, reviews]);
+
+  const selectIndex = (index: number) => {
+    setActiveIndex(index);
+    triggerSmoothScroll(index);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -314,62 +365,68 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
         )}
 
         {/* Horizontal Auto-swiping Review Feed */}
-        <div 
-          ref={scrollRef}
-          className="relative flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth pb-8 hide-scroll pt-4 px-[calc(50vw-160px)] sm:px-[calc(50vw-220px)]"
-        >
-          {(reviews || []).map((review, i) => {
-            const isActive = i === activeIndex;
-            return (
-              <div 
-                key={review.id} 
-                ref={(el) => { cardRefs.current[i] = el; }}
-                className={`snap-center flex-shrink-0 w-[280px] sm:w-[380px] rounded-3xl border p-6 sm:p-8 flex flex-col transition-all duration-500 ease-out ${
-                  isActive 
-                    ? "scale-105 opacity-100 z-10 border-primary/30 shadow-[0_20px_50px_-20px_rgba(26,60,52,0.35)] bg-background" 
-                    : "scale-95 opacity-40 blur-[0.4px] bg-background/80 border-border/80"
-                }`}
-              >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, idx) => (
-                      <Star
-                        key={idx}
-                        className={`h-4 w-4 sm:h-5 sm:w-5 ${idx < review.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`}
-                      />
-                    ))}
+        <div className="w-full min-w-0 overflow-hidden">
+          <div 
+            ref={scrollRef}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={() => setIsHovered(true)}
+            onTouchEnd={() => setIsHovered(false)}
+            className="relative flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth pb-8 hide-scroll pt-4 px-6 sm:px-12 md:px-20 lg:px-6"
+          >
+            {(reviews || []).map((review, i) => {
+              const isActive = i === activeIndex;
+              return (
+                <div 
+                  key={review.id} 
+                  ref={(el) => { cardRefs.current[i] = el; }}
+                  className={`snap-center flex-shrink-0 w-[270px] sm:w-[380px] rounded-3xl border p-6 sm:p-8 flex flex-col transition-all duration-500 ease-out ${
+                    isActive 
+                      ? "scale-105 opacity-100 z-10 border-primary/30 shadow-[0_20px_50px_-20px_rgba(26,60,52,0.35)] bg-background" 
+                      : "scale-95 opacity-40 blur-[0.4px] bg-background/80 border-border/80"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, idx) => (
+                        <Star
+                          key={idx}
+                          className={`h-4 w-4 sm:h-5 sm:w-5 ${idx < review.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[10px] sm:text-xs font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full">
+                      {new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
                   </div>
-                  <span className="text-[10px] sm:text-xs font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-                    {new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
+                  
+                  <p className="font-body text-sm sm:text-base text-foreground leading-relaxed flex-grow mb-8 italic">
+                    "{review.comment}"
+                  </p>
+                  
+                  <div className="flex items-center gap-4 mt-auto pt-5 border-t border-border/50">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-display text-sm sm:text-base font-bold text-foreground">{review.customer_name}</span>
+                      {review.is_verified_purchase && (
+                        <span className="flex items-center gap-1.5 font-body text-[10px] sm:text-xs text-primary font-semibold mt-0.5">
+                          <CheckCircle className="h-3.5 w-3.5" /> Verified Buyer
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                
-                <p className="font-body text-sm sm:text-base text-foreground leading-relaxed flex-grow mb-8 italic">
-                  "{review.comment}"
-                </p>
-                
-                <div className="flex items-center gap-4 mt-auto pt-5 border-t border-border/50">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <User className="h-5 w-5" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-display text-sm sm:text-base font-bold text-foreground">{review.customer_name}</span>
-                    {review.is_verified_purchase && (
-                      <span className="flex items-center gap-1.5 font-body text-[10px] sm:text-xs text-primary font-semibold mt-0.5">
-                        <CheckCircle className="h-3.5 w-3.5" /> Verified Buyer
-                      </span>
-                    )}
-                  </div>
-                </div>
+              );
+            })}
+            
+            {reviews.length === 0 && (
+              <div className="w-full py-20 text-center text-muted-foreground font-medium text-lg">
+                No reviews yet. Be the first to share your experience!
               </div>
-            );
-          })}
-          
-          {reviews.length === 0 && (
-            <div className="w-full py-20 text-center text-muted-foreground font-medium text-lg">
-              No reviews yet. Be the first to share your experience!
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
       </div>

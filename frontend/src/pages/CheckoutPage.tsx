@@ -17,6 +17,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const [coupons, setCoupons] = useState<any[]>([]);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponValidationResult | null>(null);
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   
   // Dynamic Suggestion Logic
   const getSuggestedCoupon = () => {
@@ -187,6 +188,7 @@ const CheckoutPage = () => {
         description: `Order ${orderData.order_number}`,
         order_id: String(orderData.razorpay.id),
         handler: async (response: any) => {
+          setIsVerifyingPayment(true);
           try {
             // 4. Verify Payment on Backend
             const verifyResponse = await fetch(`${API_BASE_URL}/api/payments/verify`, {
@@ -206,6 +208,7 @@ const CheckoutPage = () => {
             toast.success("Payment successful!");
             navigate("/order-success");
           } catch (err) {
+            setIsVerifyingPayment(false);
             toast.error(err instanceof Error ? err.message : "Verification failed. Please contact support.");
           }
         },
@@ -252,6 +255,24 @@ const CheckoutPage = () => {
     <>
       <SEO title="Checkout | WellForged" noindex={true} canonical="/checkout" />
       <Navbar />
+
+      {isVerifyingPayment && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/95 backdrop-blur-md">
+          <div className="flex flex-col items-center max-w-md p-8 text-center animate-in fade-in zoom-in duration-300">
+            {/* Spinning Green Loader */}
+            <div className="relative mb-6 flex h-20 w-20 items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+              <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
+            </div>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">Secure Handshake</p>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-3">Verifying your payment...</h2>
+            <p className="font-body text-sm text-muted-foreground leading-relaxed">
+              We are validating your transaction signature securely. Please do not refresh this page or close your browser window.
+            </p>
+          </div>
+        </div>
+      )}
+
       <main className="page-pt min-h-screen bg-background pb-[var(--space-xl)]">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           

@@ -1,9 +1,10 @@
 import { Suspense, lazy } from "react";
 import SEO from "@/components/SEO";
-import Navbar from "@/components/Navbar";
 import ManifestoHero from "@/components/ManifestoHero";
 import Footer from "@/components/Footer";
 import StickyBuyButton from "@/components/StickyBuyButton";
+import { useCart } from "@/context/CartContext";
+import { ShoppingCart } from "lucide-react";
 
 const TrustComparison = lazy(() => import("@/components/TrustComparison"));
 const NABLVerification = lazy(() => import("@/components/NABLVerification"));
@@ -24,6 +25,8 @@ const SectionFallback = () => (
 );
 
 const Index = () => {
+    const { totalItems, setIsOpen: setCartOpen } = useCart();
+
     return (
         <>
             <SEO 
@@ -42,8 +45,21 @@ const Index = () => {
                     }
                 }}
             />
-            <main className="min-h-screen page-pt">
-                <Navbar />
+            <main className="min-h-screen">
+                {/* Floating Glassmorphic Cart Button */}
+                <button
+                    onClick={() => setCartOpen(true)}
+                    className="fixed top-4 right-4 z-50 h-12 w-12 flex items-center justify-center bg-background/80 backdrop-blur-md border border-border/80 shadow-soft rounded-full hover:bg-muted transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/45"
+                    aria-label={`Cart with ${totalItems} items`}
+                >
+                    <ShoppingCart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+                    {totalItems > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center animate-in zoom-in duration-300 shadow-sm">
+                            {totalItems > 99 ? "99+" : totalItems}
+                        </span>
+                    )}
+                </button>
+
                 <ManifestoHero />
                 <Suspense fallback={<SectionFallback />}>
                     <HomeReviews />

@@ -106,39 +106,91 @@ const HomeReviews = () => {
     };
   }, [isLoading]);
 
+  const [isHovered, setIsHovered] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     fetchReviews();
   }, []);
 
-  // Auto-advance active index every 3 seconds (only when intersecting)
-  useEffect(() => {
-    if (reviews.length <= 1 || !isIntersecting) return;
-    
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % reviews.length);
-    }, 3000);
-    
-    return () => clearInterval(interval);
-  }, [reviews, isIntersecting]);
-
-  // Center active index on change (guarded by isIntersecting)
-  useEffect(() => {
-    if (reviews.length === 0 || !scrollRef.current || !isIntersecting) return;
+  const triggerSmoothScroll = (targetIndex: number) => {
+    if (!scrollRef.current) return;
     const container = scrollRef.current;
-    const activeCard = cardRefs.current[activeIndex];
+    const activeCard = cardRefs.current[targetIndex];
     if (activeCard) {
+      setIsScrolling(true);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+
       const cardOffsetLeft = activeCard.offsetLeft;
       const cardWidth = activeCard.clientWidth;
       const containerWidth = container.clientWidth;
-      
       const targetScrollLeft = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2);
       
       container.scrollTo({
         left: targetScrollLeft,
         behavior: "smooth"
       });
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 600);
     }
-  }, [activeIndex, reviews, isIntersecting]);
+  };
+
+  // Auto-advance active index every 4 seconds (only when intersecting and not hovered)
+  useEffect(() => {
+    if (reviews.length <= 1 || !isIntersecting || isHovered) return;
+    
+    const interval = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % reviews.length;
+      setActiveIndex(nextIndex);
+      triggerSmoothScroll(nextIndex);
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [reviews, isIntersecting, isHovered, activeIndex]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current || reviews.length === 0 || isScrolling) return;
+    const container = scrollRef.current;
+    const scrollLeft = container.scrollLeft;
+    const containerWidth = container.clientWidth;
+    
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    
+    cardRefs.current.forEach((card, idx) => {
+      if (card) {
+        const cardCenter = card.offsetLeft + card.clientWidth / 2;
+        const containerCenter = scrollLeft + containerWidth / 2;
+        const distance = Math.abs(cardCenter - containerCenter);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = idx;
+        }
+      }
+    });
+    
+    if (closestIndex !== activeIndex) {
+      setActiveIndex(closestIndex);
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [activeIndex, isScrolling, reviews]);
+
+  const selectIndex = (index: number) => {
+    setActiveIndex(index);
+    triggerSmoothScroll(index);
+  };
 
   if (isLoading) return <div className="py-16 text-center text-muted-foreground animate-pulse">Loading verified reviews...</div>;
 
@@ -164,7 +216,7 @@ const HomeReviews = () => {
         {/* Header */}
         <ScrollReveal animation="fade-up" className="text-center mb-12 sm:mb-16">
           <span className="inline-block font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-primary mb-3 font-semibold">User Endorsements</span>
-          <h2 className="font-display text-3xl sm:text-5xl font-bold text-foreground mb-4">Verified Customer Results</h2>
+          <h2 className="font-display text-2xl sm:text-4xl font-bold text-foreground mb-4">Verified Customer Results</h2>
           <p className="font-body text-muted-foreground max-w-2xl mx-auto leading-relaxed text-sm sm:text-base">
             Honest reviews from real daily users. Backed by verified batch reports and zero additives.
           </p>
@@ -183,7 +235,7 @@ const HomeReviews = () => {
                 <div className="space-y-6 sm:space-y-8">
                   {/* Score */}
                   <div className="flex items-center gap-4 sm:gap-6">
-                    <span className="font-display text-6xl sm:text-7xl font-bold text-foreground leading-none tracking-tight">
+                    <span className="font-display text-5xl sm:text-6xl font-bold text-foreground leading-none tracking-tight">
                       {Number(stats.averageRating).toFixed(1)}
                     </span>
                     <div className="space-y-1 sm:space-y-2">
@@ -249,12 +301,16 @@ const HomeReviews = () => {
           </div>
 
           {/* RIGHT COLUMN: Curriculum Carousel Card Showcase */}
-          <div className="lg:col-span-8 flex flex-col justify-center">
+          <div className="lg:col-span-8 flex flex-col justify-center min-w-0 w-full overflow-hidden">
             <ScrollReveal animation="fade-left" className="w-full">
               
               <div 
                 ref={scrollRef}
-                className="relative flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth pb-6 hide-scroll pt-2 px-[calc(50vw-160px)] sm:px-[calc(50vw-220px)] lg:px-[calc(33vw-180px)]"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onTouchStart={() => setIsHovered(true)}
+                onTouchEnd={() => setIsHovered(false)}
+                className="relative flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth pb-6 hide-scroll pt-2 px-6 sm:px-12 md:px-20 lg:px-6"
               >
                 {reviews.map((review, i) => {
                   const isActive = i === activeIndex;
@@ -310,7 +366,7 @@ const HomeReviews = () => {
                 {reviews.map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => setActiveIndex(i)}
+                    onClick={() => selectIndex(i)}
                     className={`h-2 rounded-full transition-all duration-300 ${
                       i === activeIndex ? "w-6 bg-primary" : "w-2 bg-primary/20 hover:bg-primary/45"
                     }`}
