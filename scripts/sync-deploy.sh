@@ -11,8 +11,16 @@ MONOREPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FRONTEND_DIR="$MONOREPO_ROOT/frontend"
 BACKEND_DIR="$MONOREPO_ROOT/Backend"
 
-UI_REPO="https://github.com/AMOLIAYUSH/wellforged-ui.git"
-API_REPO="https://github.com/AMOLIAYUSH/wellforged-api.git"
+# Dynamically extract git credentials from local git origin to satisfy push protection and allow auto-auth
+REMOTE_URL=$(git remote get-url origin)
+if [[ "$REMOTE_URL" == *"https://"* && "$REMOTE_URL" == *"@github.com"* ]]; then
+  AUTH_PREFIX=$(echo "$REMOTE_URL" | sed -E 's|https://([^@]+)@github.com.*|\1|')
+  UI_REPO="https://${AUTH_PREFIX}@github.com/WellForged1903/wellforged-ui.git"
+  API_REPO="https://${AUTH_PREFIX}@github.com/WellForged1903/wellforged-api.git"
+else
+  UI_REPO="https://github.com/WellForged1903/wellforged-ui.git"
+  API_REPO="https://github.com/WellForged1903/wellforged-api.git"
+fi
 
 TEMP_DIR="/tmp/wellforged-sync"
 

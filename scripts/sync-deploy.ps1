@@ -14,8 +14,16 @@ $MONOREPO_ROOT = Split-Path -Parent $PSScriptRoot
 $FRONTEND_DIR  = Join-Path $MONOREPO_ROOT "frontend"
 $BACKEND_DIR   = Join-Path $MONOREPO_ROOT "Backend"
 
-$UI_REPO  = "https://github.com/AMOLIAYUSH/wellforged-ui.git"
-$API_REPO = "https://github.com/AMOLIAYUSH/wellforged-api.git"
+# Dynamically extract git credentials from local git origin to satisfy push protection and allow auto-auth
+$REMOTE_URL = git remote get-url origin
+if ($REMOTE_URL -like "*https://*" -and $REMOTE_URL -like "*@github.com*") {
+    $AUTH_PREFIX = [regex]::Match($REMOTE_URL, 'https://([^@]+)@github.com').Groups[1].Value
+    $UI_REPO  = "https://${AUTH_PREFIX}@github.com/WellForged1903/wellforged-ui.git"
+    $API_REPO = "https://${AUTH_PREFIX}@github.com/WellForged1903/wellforged-api.git"
+} else {
+    $UI_REPO  = "https://github.com/WellForged1903/wellforged-ui.git"
+    $API_REPO = "https://github.com/WellForged1903/wellforged-api.git"
+}
 
 $TEMP_DIR = Join-Path $env:TEMP "wellforged-sync"
 
