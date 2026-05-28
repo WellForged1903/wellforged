@@ -6,7 +6,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import ProductSelector from "@/components/ProductSelector";
-import ReviewsSection from "@/components/ReviewsSection";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import PageLoader from "@/components/PageLoader";
 import { Button } from "@/components/ui/button";
@@ -346,10 +345,10 @@ const ProductPage = () => {
                       {product?.name || "Pure Moringa Powder"}
                     </h1>
                     
-                    {/* Dynamic Stars linking to Review Section */}
+                    {/* Dynamic Stars linking to Reviews Hub */}
                     <div 
                       className="flex items-center gap-2 cursor-pointer group w-fit" 
-                      onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() => navigate("/reviews")}
                     >
                       <div className="flex text-[#FFB800] gap-0.5">
                         {[...Array(5)].map((_, i) => (
@@ -607,8 +606,6 @@ const ProductPage = () => {
             </ScrollReveal>
           </div>
         </section>
-
-        {product && <ReviewsSection productId={product.id.toString()} />}
 
       {/* Sticky Mobile Add-to-Cart Footer */}
       <div 

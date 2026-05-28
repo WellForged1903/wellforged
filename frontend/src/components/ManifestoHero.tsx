@@ -1,13 +1,33 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, ShieldCheck } from "lucide-react";
+import { ShoppingBag, ShieldCheck, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AnimatedLogo from "@/components/AnimatedLogo";
+import { API_BASE_URL } from "@/config";
 
 const HERO_WORDS = ["Wellness,", "Forged", "with", "Integrity."];
 
 const ManifestoHero = () => {
   const [visibleWords, setVisibleWords] = useState(0);
+  const [reviewStats, setReviewStats] = useState({ totalReviews: 0, averageRating: 0.0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/reviews?slug=moringa-powder&t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          setReviewStats({
+            totalReviews: data.stats.totalReviews,
+            averageRating: data.stats.averageRating
+          });
+        }
+      } catch (e) {
+        console.error("Failed to fetch review stats", e);
+      }
+    };
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -33,11 +53,32 @@ const ManifestoHero = () => {
           <AnimatedLogo size="hero" className="animate-subtle-float" />
         </div>
 
-        <div className="animate-hero-fade-up mb-4 sm:mb-[var(--space-sm)]">
+        <div className="animate-hero-fade-up mb-4 sm:mb-[var(--space-xs)] flex flex-col items-center gap-3">
           <span className="premium-pill max-w-full gap-2 px-5 py-2.5 text-[0.68rem] sm:text-[var(--text-xs)] font-bold uppercase tracking-[0.18em] text-primary shadow-sm hover:shadow-md transition-shadow duration-300">
             <ShieldCheck className="h-3.5 w-3.5" />
             The No Nonsense Supplement Brand
           </span>
+
+          {reviewStats.totalReviews > 0 && (
+            <Link 
+              to="/reviews" 
+              className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5 hover:border-primary/20 hover:bg-primary/10 transition-all duration-300 group shadow-sm hover:shadow-md"
+            >
+              <div className="flex text-[#FFB800] gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`h-3.5 w-3.5 ${
+                      i < Math.round(reviewStats.averageRating) ? "fill-current" : "text-muted fill-muted"
+                    }`} 
+                  />
+                ))}
+              </div>
+              <span className="font-body text-[10px] sm:text-xs font-semibold text-primary">
+                {reviewStats.averageRating.toFixed(1)}/5 Rating ({reviewStats.totalReviews} verified reviews)
+              </span>
+            </Link>
+          )}
         </div>
 
         <h1 className="font-display font-semibold text-foreground leading-[1.08] sm:leading-[1.04] mb-4 sm:mb-[var(--space-md)]" style={{ fontSize: "var(--text-5xl)", textWrap: "balance" } as React.CSSProperties}>
