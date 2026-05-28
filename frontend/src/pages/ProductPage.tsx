@@ -399,7 +399,7 @@ const ProductPage = () => {
               <div className="space-y-6 text-center">
                 <p className="eyebrow-label text-primary">Ingredient Philosophy</p>
                 <h2 className="section-title text-foreground" style={{ fontSize: "var(--text-3xl)" }}>Why We Chose Moringa</h2>
-                <p className="section-copy text-balance leading-relaxed text-muted-foreground" style={{ fontSize: "var(--text-lg)" }}>
+                <p className="section-copy text-balance leading-relaxed text-muted-foreground">
                   Moringa has long been valued as a nutrient-dense plant ingredient. We chose moringa for its versatility, simplicity, and alignment with our clean nutrition philosophy—disciplined sourcing and absolute purity.
                 </p>
               </div>
@@ -426,7 +426,7 @@ const ProductPage = () => {
                     <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Check className="h-3.5 w-3.5" />
                     </div>
-                    <span className="font-body text-base font-medium text-foreground sm:text-lg">{item}</span>
+                    <span className="font-body text-sm font-medium text-foreground sm:text-base">{item}</span>
                   </div>
                 ))}
               </div>
@@ -443,16 +443,16 @@ const ProductPage = () => {
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
                     <HeartHandshake className="h-6 w-6 text-primary" />
                   </div>
-                  <h2 className="font-display text-3xl font-bold text-foreground sm:text-4xl">Who Is It For?</h2>
-                  <p className="font-body text-lg leading-relaxed text-muted-foreground">
+                  <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Who Is It For?</h2>
+                  <p className="font-body text-sm sm:text-base leading-relaxed text-muted-foreground">
                     Perfect for those seeking an uncomplicated greens habit without the clutter of sweeteners, flavors, or artificial blends. 
                     If you value ingredient integrity over over-engineered marketing, you've found your daily ritual.
                   </p>
                 </div>
-                <div className="premium-panel bg-background/50 p-8 shadow-sm">
-                   <ul className="space-y-4">
+                <div className="premium-panel bg-background/50 p-6 sm:p-8 shadow-sm">
+                   <ul className="space-y-3.5">
                      {["Clean Label Enthusiasts", "Minimalist Nutrition Seekers", "Daily Habit Builders", "Transparent Quality Advocates"].map((tp) => (
-                       <li key={tp} className="flex items-center gap-3 font-display text-sm font-semibold tracking-wide text-primary">
+                       <li key={tp} className="flex items-center gap-3 font-body text-xs sm:text-sm font-semibold tracking-wide text-primary">
                          <CheckCircle2 className="h-4 w-4" /> {tp}
                        </li>
                      ))}
@@ -477,8 +477,8 @@ const ProductPage = () => {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
                       <Sparkles className="h-6 w-6 text-primary" />
                     </div>
-                    <h2 className="font-display text-3xl font-bold text-foreground sm:text-4xl">How to Use</h2>
-                    <p className="font-body text-lg leading-relaxed text-muted-foreground">
+                    <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">How to Use</h2>
+                    <p className="font-body text-sm sm:text-base leading-relaxed text-muted-foreground">
                       Add one spoon to water, smoothies, or curd. The ritual is simple: mix well and consume immediately. 
                       Consistency is key—integrated it into your morning routine for the best long-term wellness impact.
                     </p>
@@ -497,8 +497,8 @@ const ProductPage = () => {
                   <Clock3 className="h-6 w-6 text-primary" />
                 </div>
                 <div className="space-y-4">
-                  <h2 className="font-display text-3xl font-bold text-foreground sm:text-4xl">The Expected Experience</h2>
-                  <p className="mx-auto max-w-2xl font-body text-lg leading-relaxed text-muted-foreground">
+                  <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">The Expected Experience</h2>
+                  <p className="mx-auto max-w-2xl font-body text-sm sm:text-base leading-relaxed text-muted-foreground">
                     Our moringa is earthy and neutral—just as nature intended. You'll notice a fine, consistent texture that blends smoothly. 
                     Expect a habit that feels grounded, clean, and entirely sustainable without the 'crash' or gimmicks.
                   </p>
