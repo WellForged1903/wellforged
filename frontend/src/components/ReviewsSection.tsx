@@ -225,6 +225,13 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ productId }) => {
 
   if (isLoading) return <div id="reviews" className="py-10 text-center text-muted-foreground animate-pulse">Loading reviews...</div>;
 
+  const total = reviews.length;
+  const fiveStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 5).length / total) * 100) : 0;
+  const fourStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 4).length / total) * 100) : 0;
+  const threeStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 3).length / total) * 100) : 0;
+  const twoStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 2).length / total) * 100) : 0;
+  const oneStarPct = total > 0 ? Math.round((reviews.filter(r => r.rating === 1).length / total) * 100) : 0;
+
   return (
     <section 
       ref={sectionRef}
