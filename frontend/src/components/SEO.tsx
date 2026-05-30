@@ -10,6 +10,7 @@ interface SEOProps {
   jsonLd?: Record<string, any> | Array<Record<string, any>>;
   googleSiteVerification?: string;
   noindex?: boolean;
+  keywords?: string;
 }
 
 const SEO = ({
@@ -22,6 +23,7 @@ const SEO = ({
   jsonLd,
   googleSiteVerification = "uUXT8EOkidxG6y1nmQDFnmQYk6xex_vD_qgqY-AunuQ",
   noindex = false,
+  keywords = "moringa powder india, NABL tested moringa, lab tested moringa powder, organic moringa powder, buy moringa powder india, moringa oleifera powder",
 }: SEOProps) => {
   const siteName = "WellForged";
   const origin = "https://www.wellforged.in";
@@ -69,6 +71,7 @@ const SEO = ({
       {/* Basic Meta Tags */}
       <title>{formattedTitle}</title>
       <meta name="description" content={description} />
+      {keywords && <meta name="keywords" content={keywords} />}
       <link rel="canonical" href={canonicalUrl} />
       
       {/* Google Search Console Verification */}

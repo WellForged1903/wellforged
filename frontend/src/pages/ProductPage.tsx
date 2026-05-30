@@ -210,10 +210,10 @@ const ProductPage = () => {
     return <PageLoader />;
   }
 
-  const productName = product?.name || "Organic Export-Grade Moringa Powder";
-  const productDescription = product?.base_description || "Source pure, premium-grade Moringa powder packed with antioxidants. 100% transparent sourcing and batch testing.";
+  const productName = product?.name || "Moringa Powder";
+  const productDescription = product?.base_description || "India's most transparent Moringa Powder — every batch NABL-certified & independently tested. Verify your lab report by batch number. No fillers. Buy now.";
   const canonicalUrl = "https://www.wellforged.in/product";
-  const seoTitle = `${productName} | WellForged`;
+  const seoTitle = `Buy Moringa Powder India — NABL Lab Tested | WellForged`;
 
   return (
     <>
@@ -223,35 +223,85 @@ const ProductPage = () => {
         canonical={canonicalUrl}
         ogType="product"
         ogImage="/Packaging_Updated.png"
-        jsonLd={{
-          "@context": "https://schema.org/",
-          "@type": "Product",
-          "name": `Wellforged ${productName}`,
-          "image": [
-            productImage1,
-            "https://www.wellforged.in/Packaging_Updated.png"
-          ],
-          "description": productDescription,
-          "sku": slug,
-          "mpn": "WF-MOR-01",
-          "brand": {
-            "@type": "Brand",
-            "name": "WellForged"
+        jsonLd={[
+          {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": `WellForged ${productName}`,
+            "image": [
+              productImage1,
+              "https://www.wellforged.in/Packaging_Updated.png"
+            ],
+            "description": "Pure Moringa Oleifera leaf powder — single-origin sourced from Tamil Nadu farms, independently tested at NABL-accredited laboratories for heavy metals, pesticides, and potency. No fillers, no additives.",
+            "sku": slug,
+            "mpn": "WF-MOR-01",
+            "category": "Health Supplements > Moringa Powder",
+            "keywords": ["moringa powder", "NABL tested moringa", "lab verified moringa", "organic moringa india", "buy moringa powder india"],
+            "brand": {
+              "@type": "Brand",
+              "name": "WellForged"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": reviewStats.averageRating > 0 ? reviewStats.averageRating.toFixed(1) : "4.8",
+              "reviewCount": reviewStats.totalReviews > 0 ? reviewStats.totalReviews : 124
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": canonicalUrl,
+              "priceCurrency": "INR",
+              "price": "499",
+                "availability": "https://schema.org/InStock",
+              "itemCondition": "https://schema.org/NewCondition"
+            }
           },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "124"
-          },
-          "offers": {
-            "@type": "Offer",
-            "url": canonicalUrl,
-            "priceCurrency": "INR",
-            "price": "499",
-            "availability": "https://schema.org/InStock",
-            "itemCondition": "https://schema.org/NewCondition"
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is NABL tested moringa powder?",
+                "acceptedAnswer": { "@type": "Answer", "text": "NABL (National Accreditation Board for Testing and Calibration Laboratories) testing means a government-accredited independent lab has verified the product for heavy metals, pesticides, and microbial purity. WellForged moringa is tested at NABL-certified labs for every single batch — not just samples. You can verify your exact batch report on our Transparency page." }
+              },
+              {
+                "@type": "Question",
+                "name": "Which moringa powder brand is lab tested in India?",
+                "acceptedAnswer": { "@type": "Answer", "text": "WellForged is one of the very few Indian moringa powder brands that independently tests every production batch at NABL-accredited laboratories for heavy metals (Lead, Mercury, Arsenic, Cadmium), pesticides (200+ compounds), and microbial counts. Every batch Certificate of Analysis is publicly available on the Transparency page." }
+              },
+              {
+                "@type": "Question",
+                "name": "How do I know if moringa powder is pure?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Pure moringa powder should be bright green in colour, have a slightly grassy earthy smell, and come with a third-party lab Certificate of Analysis (COA). WellForged provides the raw NABL lab report for every batch — enter your batch number on the Transparency page to verify your specific jar's purity report." }
+              },
+              {
+                "@type": "Question",
+                "name": "Is every single batch of WellForged Moringa individually lab-tested?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. We do not do batch-sampling. Every single production run undergoes independent NABL-accredited laboratory verification for heavy metals, pesticides, and microbial counts. You can verify your exact jar's raw lab certificate using the Transparency page." }
+              },
+              {
+                "@type": "Question",
+                "name": "What makes export-grade Moringa powder different from regular moringa?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Export-grade moringa meets international purity standards for heavy metals and pesticides — stricter than domestic compliance. WellForged moringa is sourced exclusively from organic-certified farms in Southern India and processed only from tender young leaves, which have the highest density of vitamins and active antioxidants." }
+              },
+              {
+                "@type": "Question",
+                "name": "How much moringa powder should I take per day?",
+                "acceptedAnswer": { "@type": "Answer", "text": "We recommend taking 1 teaspoon (approximately 3 grams) daily. Many prefer it in the morning mixed with lukewarm water or blended into a green smoothie, but it is equally beneficial anytime during the day. Do not exceed 2 teaspoons per day unless advised by a healthcare professional." }
+              },
+              {
+                "@type": "Question",
+                "name": "Is WellForged Moringa FSSAI approved?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. WellForged Moringa powder is manufactured in an FSSAI-compliant facility. Additionally, every batch is independently tested at NABL-accredited third-party laboratories for safety and purity verification." }
+              },
+              {
+                "@type": "Question",
+                "name": "Where is WellForged Moringa sourced from?",
+                "acceptedAnswer": { "@type": "Answer", "text": "WellForged Moringa is single-origin sourced from organic-certified farms in Tamil Nadu, Southern India — a region known for its ideal climate and soil conditions for growing high-potency Moringa Oleifera. We process only the tender young leaves to preserve maximum nutritional density." }
+              }
+            ]
           }
-        }}
+        ]}
       />
       <Navbar />
       <main className="min-h-screen bg-background pb-20 pt-16 sm:pb-0 sm:pt-20">

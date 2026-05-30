@@ -49,7 +49,7 @@ const NABLVerification = () => {
               Independent NABL Verification
             </h2>
             <p className="font-body text-[var(--text-base)] sm:text-[var(--text-lg)] text-muted-foreground max-w-xl sm:max-w-2xl mx-auto leading-relaxed px-2">
-              Every batch undergoes independent testing at NABL-accredited laboratories. We do not ask you to assume purity. We show you the record behind it.
+              Every batch of our pure <strong>Moringa Oleifera leaf powder</strong> undergoes independent testing at NABL-accredited laboratories. We do not ask you to assume purity. We show you the record behind it.
             </p>
           </div>
         </ScrollReveal>

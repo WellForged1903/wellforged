@@ -33,17 +33,28 @@ const Index = () => {
                 title="WellForged"
                 description="The No-Nonsense Moringa powder — NABL-certified & independently tested every batch. Enter your batch number to access your lab reports. No fillers. Just proof."
                 canonical="/"
-                jsonLd={{
-                    "@context": "https://schema.org",
-                    "@type": "WebSite",
-                    "url": "https://www.wellforged.in/",
-                    "name": "Wellforged",
-                    "potentialAction": {
-                        "@type": "SearchAction",
-                        "target": "https://www.wellforged.in/product?search={search_term_string}",
-                        "query-input": "required name=search_term_string"
+                keywords="moringa powder india, NABL tested moringa powder, buy moringa powder india, lab tested moringa, organic moringa powder india, moringa oleifera leaf powder"
+                jsonLd={[
+                    {
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        "url": "https://www.wellforged.in/",
+                        "name": "WellForged",
+                        "potentialAction": {
+                            "@type": "SearchAction",
+                            "target": "https://www.wellforged.in/product?search={search_term_string}",
+                            "query-input": "required name=search_term_string"
+                        }
+                    },
+                    {
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.wellforged.in/" },
+                            { "@type": "ListItem", "position": 2, "name": "Moringa Powder", "item": "https://www.wellforged.in/product" }
+                        ]
                     }
-                }}
+                ]}
             />
             <main className="min-h-screen">
                 {/* Floating Glassmorphic Cart Button */}
