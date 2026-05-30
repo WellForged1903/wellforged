@@ -143,9 +143,9 @@ const BlogIndex = () => {
             <div className="lg:col-span-7 flex items-center justify-center w-full">
               {loading ? (
                 /* Luxury Shimmer Loader for Above the Fold Tile */
-                <div className="bg-card border border-border rounded-[2rem] overflow-hidden shadow-soft animate-pulse w-full h-[360px] lg:h-[420px]">
-                  <div className="h-1/2 bg-muted" />
-                  <div className="p-6 space-y-3">
+                <div className="bg-card border border-border rounded-[2rem] overflow-hidden shadow-soft animate-pulse w-full">
+                  <div className="aspect-[16/9] lg:aspect-[2/1] bg-muted w-full" />
+                  <div className="p-6 space-y-4">
                     <div className="h-3 bg-muted w-1/4 rounded" />
                     <div className="h-5 bg-muted w-3/4 rounded" />
                     <div className="h-3 bg-muted w-full rounded" />
@@ -154,16 +154,16 @@ const BlogIndex = () => {
                 </div>
               ) : filteredPosts.length === 0 ? (
                 /* Empty state if search yields no results */
-                <div className="w-full h-[360px] lg:h-[420px] bg-card/40 border border-border border-dashed rounded-[2rem] flex flex-col items-center justify-center p-8 text-center shadow-soft">
+                <div className="w-full min-h-[360px] bg-card/40 border border-border border-dashed rounded-[2rem] flex flex-col items-center justify-center p-8 text-center shadow-soft">
                   <BookOpen className="w-12 h-12 text-muted-foreground/30 mb-4" />
                   <h3 className="font-display text-base font-semibold text-foreground">No matches found</h3>
                   <p className="text-muted-foreground text-xs mt-2 max-w-xs mx-auto">Try refining your keyword search or select another category filter to find articles.</p>
                 </div>
               ) : (
                 /* Compact, Elegant Featured Post */
-                <div className="group bg-card border border-border rounded-[2rem] overflow-hidden shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-500 flex flex-col h-[360px] lg:h-[420px] w-full">
-                  {/* Image container with standard 16:9 aspect ratio */}
-                  <div className="relative aspect-[16/9] w-full overflow-hidden shrink-0 border-b border-border/40">
+                <div className="group bg-card border border-border rounded-[2rem] overflow-hidden shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-500 flex flex-col w-full h-full">
+                  {/* Image container with standard 16:9 aspect ratio, wider on desktop */}
+                  <div className="relative aspect-[16/9] lg:aspect-[2/1] w-full overflow-hidden shrink-0 border-b border-border/40">
                     {filteredPosts[0].image_url ? (
                       <img 
                         src={filteredPosts[0].image_url} 
