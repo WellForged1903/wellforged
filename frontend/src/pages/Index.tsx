@@ -30,7 +30,7 @@ const Index = () => {
     return (
         <>
             <SEO 
-                title="WellForged"
+                title="WellForged — Pure, NABL Lab-Tested Moringa Powder India"
                 description="The No-Nonsense Moringa powder — NABL-certified & independently tested every batch. Enter your batch number to access your lab reports. No fillers. Just proof."
                 canonical="/"
                 keywords="moringa powder india, NABL tested moringa powder, buy moringa powder india, lab tested moringa, organic moringa powder india, moringa oleifera leaf powder"
